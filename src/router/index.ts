@@ -32,5 +32,19 @@ export default route(function (/* { store, ssrContext } */) {
     history: createHistory(process.env.VUE_ROUTER_BASE),
   });
 
+  Router.beforeEach((to, from, next) => {
+    const token = localStorage.getItem('token');
+
+    const isProtectedRoute = to.matched.some(item => item.meta.isProtectedRoute);
+
+    if (isProtectedRoute && !token) {
+      next({ name: 'Login' });
+    } else if (!isProtectedRoute && token !== null && to.name === 'Login') {
+      next({ name: 'Home' });
+    } else {
+      next();
+    }
+  });
+
   return Router;
 });

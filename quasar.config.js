@@ -10,7 +10,10 @@
 
 
 const { configure } = require('quasar/wrappers');
+const dotenv = require('dotenv');
+const { resolve } = require('path');
 
+dotenv.config({ path: resolve(__dirname, '.env') });
 
 module.exports = configure(function (/* ctx */) {
   return {
@@ -21,8 +24,6 @@ module.exports = configure(function (/* ctx */) {
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
     boot: [
-      
-      
     ],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#css
@@ -51,7 +52,7 @@ module.exports = configure(function (/* ctx */) {
         node: 'node20'
       },
 
-      vueRouterMode: 'hash', // available values: 'hash', 'history'
+      vueRouterMode: 'history', // available values: 'hash', 'history'
       // vueRouterBase,
       // vueDevtools,
       // vueOptionsAPI: false,
@@ -60,7 +61,10 @@ module.exports = configure(function (/* ctx */) {
 
       // publicPath: '/',
       // analyze: true,
-      // env: {},
+      env: {
+        APP_BASE_URL: process.env.APP_BASE_URL,
+        CONTEXT_API_AUTH: process.env.CONTEXT_API_AUTH
+      },
       // rawDefine: {}
       // ignorePublicFolder: true,
       // minify: false,
@@ -103,7 +107,10 @@ module.exports = configure(function (/* ctx */) {
       // directives: [],
 
       // Quasar plugins
-      plugins: []
+      plugins: [
+        'Loading',
+        'Notify'
+      ]
     },
 
     // animations: 'all', // --- includes all animations
