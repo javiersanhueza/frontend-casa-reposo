@@ -45,3 +45,26 @@ input:-webkit-autofill:active {
       #7579ff
   ); /* Gradiente de color */
 }
+
+.background-header {
+  background: linear-gradient(
+      to right,
+      #b224ef,
+      #7579ff
+  ); /* Gradiente de color */
+}
+
+.dialog-fullscreen {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.dialog-content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.dialog-actions {
+  margin-top: auto;
+}

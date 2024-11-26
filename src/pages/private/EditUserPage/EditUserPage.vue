@@ -1,11 +1,11 @@
 <template>
-  <div>home</div>
+  <div>Editar Usuario</div>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-  name: 'HomePage'
+  name: 'EditUser'
 })
 </script>

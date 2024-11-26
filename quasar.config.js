@@ -63,7 +63,8 @@ module.exports = configure(function (/* ctx */) {
       // analyze: true,
       env: {
         APP_BASE_URL: process.env.APP_BASE_URL,
-        CONTEXT_API_AUTH: process.env.CONTEXT_API_AUTH
+        CONTEXT_API_AUTH: process.env.CONTEXT_API_AUTH,
+        CONTEXT_API_PRIVATE: process.env.CONTEXT_API_PRIVATE,
       },
       // rawDefine: {}
       // ignorePublicFolder: true,

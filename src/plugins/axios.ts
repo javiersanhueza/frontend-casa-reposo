@@ -20,19 +20,10 @@ apiClient.interceptors.request.use(config => {
     message: 'Cargando...'
   });
   return config;
-  }, error => {
-    Loading.hide();
-    return Promise.reject(error);
-});
-
-// Interceptor para mostrar el loading antes de cada solicitud
-apiClient.interceptors.request.use(config => {
-
-  return config;
 }, error => {
   Loading.hide();
   return Promise.reject(error);
-})
+});
 
 // Interceptor para manejar errores y ocultar el loading después de cada respuesta
 apiClient.interceptors.response.use(
@@ -42,7 +33,13 @@ apiClient.interceptors.response.use(
   },
   error => {
     Loading.hide();
-    console.log(error);
+
+    if (error.response && error.response.status === 401) {
+      // Token no válido o expirado
+      localStorage.clear();
+      window.location.href = '/';
+    }
+
     Notify.create({
       type: 'negative',
       message: error.response?.data?.message || 'Error desconocido',
@@ -52,6 +49,7 @@ apiClient.interceptors.response.use(
 
     return Promise.reject(error);
   }
-)
+);
 
 export default apiClient;
+

@@ -2,16 +2,13 @@
   <q-page class="row bg-page items-center justify-evenly">
     <div class="container-login">
       <q-card class="wrap-login100">
-        <q-card-section class="text-center">
-          <q-img
-            src="src/assets/logo_app_white.png"
-            width="50%"
-            height="50%"
-            color="white"
-          />
+        <q-card-section>
+          <div class="text-h6 text-center text-white">
+            Selecciona una empresa.
+          </div>
         </q-card-section>
         <q-card-section>
-          <login />
+          <change-company-form />
         </q-card-section>
       </q-card>
     </div>
@@ -20,17 +17,10 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-
-import Login from 'pages/public/LoginPage/components/Login.vue';
+import ChangeCompanyForm from 'pages/private/ChangeCompanyPage/components/ChangeCompanyForm.vue';
 
 export default defineComponent({
-  name: 'LoginPage',
-
-  components: {
-    Login,
-  },
-
-  setup() {
-  },
+  name: 'ChangeCompany',
+  components: { ChangeCompanyForm },
 });
 </script>

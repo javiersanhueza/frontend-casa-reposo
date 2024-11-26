@@ -5,7 +5,8 @@ import apiClient from 'src/plugins/axios';
 import {
   LoginResponse,
   UserLogin,
-  RegisterResponse, DefaultResponse
+  RegisterResponse,
+  DefaultResponse
 } from 'src/interfaces/auth/auth.interfaces';
 import { Notify } from 'quasar';
 
@@ -19,9 +20,11 @@ export const useAuthStore = defineStore('auth', {
     token: null,
     user: null
   }),
+
   getters: {
     isAuthenticated: (state: AuthState) => !!state.token
   },
+
   actions: {
     async login(email: string, password: string) {
       try {
