@@ -1,11 +1,10 @@
 <template>
   <q-dialog v-model="internalDialog" persistent>
-    <q-card class="q-dialog-plugin">
-      <q-card-section>
-        <div class="row items-center justify-between">
-          <div class="text-h6 text-grey-7">{{ title }}</div>
-          <q-btn flat round dense icon="close" @click="internalDialog = false" />
-        </div>
+    <q-card class="">
+      <q-card-section class="row">
+        <div class="text-h6 text-grey-7 q-mr-lg">{{ title }}</div>
+        <q-space />
+        <q-btn flat round dense icon="close" @click="internalDialog = false" />
       </q-card-section>
 
       <q-card-section class="text-grey-9">

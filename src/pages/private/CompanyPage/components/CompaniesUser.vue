@@ -76,6 +76,7 @@
       color="grey-8"
       :max="pagesNumber"
       size="sm"
+      v-if="pagesNumber > 1"
     />
   </div>
 
