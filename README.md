@@ -1,4 +1,4 @@
-# Resultados Operacionales (frontend)
+# Casa de reposo (frontend)
 
 dashboard
 
