@@ -14,7 +14,7 @@
             label="Nombres"
             lazy-rules
             :rules="[
-              val => val && val.length > 0 || 'Campo requerido'
+              (val: string) => val && val.length > 0 || 'Campo requerido'
             ]"
           />
           <div class="row">
@@ -24,7 +24,7 @@
                 label="Apellido Paterno"
                 lazy-rules
                 :rules="[
-                val => val && val.length > 0 || 'Campo requerido'
+                (val: string) => val && val.length > 0 || 'Campo requerido'
                 ]"
               />
             </div>
@@ -34,7 +34,7 @@
                 label="Apellido Materno"
                 lazy-rules
                 :rules="[
-                  val => val && val.length > 0 || 'Campo requerido'
+                  (val: string) => val && val.length > 0 || 'Campo requerido'
                 ]"
               />
             </div>
@@ -44,8 +44,8 @@
             label="Rut"
             lazy-rules
             :rules="[
-              val => val && val.length > 0 || 'Campo requerido',
-              val => validateRut(val) || 'RUT inválido'
+              (val: string) => val && val.length > 0 || 'Campo requerido',
+              (val: string) => validateRut(val) || 'RUT inválido'
             ]"
             @update:model-value="newEmployee.rut = formatRut($event)"
             :disable="isEdit"

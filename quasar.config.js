@@ -13,7 +13,11 @@ const { configure } = require('quasar/wrappers');
 const dotenv = require('dotenv');
 const { resolve } = require('path');
 
-dotenv.config({ path: resolve(__dirname, '.env') });
+
+// Detecta el entorno desde una variable de entorno o usa 'dev' por defecto
+const envName = process.env.ENV || 'dev';
+
+dotenv.config({ path: resolve(__dirname, `.env.${envName}`) });
 
 module.exports = configure(function (/* ctx */) {
   return {
@@ -65,6 +69,7 @@ module.exports = configure(function (/* ctx */) {
         APP_BASE_URL: process.env.APP_BASE_URL,
         CONTEXT_API_AUTH: process.env.CONTEXT_API_AUTH,
         CONTEXT_API_PRIVATE: process.env.CONTEXT_API_PRIVATE,
+        ENV: process.env.ENV
       },
       // rawDefine: {}
       // ignorePublicFolder: true,
@@ -98,7 +103,7 @@ module.exports = configure(function (/* ctx */) {
       config: {},
 
       // iconSet: 'material-icons', // Quasar icon set
-      // lang: 'en-US', // Quasar language pack
+      lang: 'es', // Quasar language pack
 
       // For special cases outside of where the auto-import strategy can have an impact
       // (like functional components as one of the examples),

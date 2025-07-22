@@ -69,7 +69,7 @@ import { useRouter } from 'vue-router';
 
 import pinia from 'src/stores';
 import { useAuthStore } from 'stores/auth';
-import { useCompanyStore } from 'stores/company';
+// import { useCompanyStore } from 'stores/company';
 
 
 export default defineComponent({
@@ -78,16 +78,17 @@ export default defineComponent({
     const email = ref<string>('');
     const password = ref<string>('');
     const authStore = useAuthStore(pinia());
-    const companyStore = useCompanyStore(pinia());
+    // const companyStore = useCompanyStore(pinia());
     const router = useRouter();
 
     const onSubmit = async () => {
       await authStore.login(email.value, password.value);
       if (authStore.isAuthenticated) {
+        await router.push({ name: 'Home' });
 
         // Obtener las empresas del usuario
 
-        await companyStore.getCompaniesForUser();
+        /*await companyStore.getCompaniesForUser();
 
         if (companyStore.companies!.length >= 2) {
 
@@ -99,7 +100,7 @@ export default defineComponent({
             localStorage.setItem('company', JSON.stringify(companyStore.companies[0]));
             router.push({ name: 'Home' });
           }
-        }
+        } */
       }
     }
     return {

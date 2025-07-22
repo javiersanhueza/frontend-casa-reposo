@@ -14,7 +14,7 @@
             label="Nombre"
             lazy-rules
             :rules="[
-              val => val && val.length > 0 || 'Campo requerido'
+              (val: string) => val && val.length > 0 || 'Campo requerido'
             ]"
           />
         </q-form>

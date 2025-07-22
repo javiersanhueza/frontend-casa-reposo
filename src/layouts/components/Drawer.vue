@@ -107,9 +107,9 @@ export default defineComponent({
     const menuConfig = ref<Menu[]>([
       {
         id: 1,
-        to: 'Companies',
-        icon: 'apartment',
-        label: 'Empresas',
+        to: 'ResidentPage',
+        icon: 'elderly',
+        label: 'Residentes',
       },
       {
         id: 2,

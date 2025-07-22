@@ -14,7 +14,7 @@
             label="Nombre"
             lazy-rules
             :rules="[
-              val => val && val.length > 0 || 'Campo requerido'
+              (val: string) => val && val.length > 0 || 'Campo requerido'
             ]"
           />
           <q-input
@@ -22,8 +22,8 @@
             label="Rut"
             lazy-rules
             :rules="[
-              val => val && val.length > 0 || 'Campo requerido',
-              val => validateRut(val) || 'RUT inválido'
+              (val: string) => val && val.length > 0 || 'Campo requerido',
+              (val: string) => validateRut(val) || 'RUT inválido'
             ]"
             @update:model-value="rut = formatRut($event)"
             :disable="isEdit"
@@ -31,7 +31,7 @@
         </q-form>
       </q-card-section>
       <q-card-actions align="right" class="q-pa-md row no-wrap items-center" :class="{'dialog-actions': $q.screen.xs}" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-        <q-btn outline label="Cancelar" color="white" text-color="purple-6" @click="internalDialog = false" />
+        <q-btn outline label="Cancelar" color="white" text-color="primary" @click="internalDialog = false" />
         <q-btn unelevated label="Aceptar" class="background-header" text-color="white" @click="submitForm" />
       </q-card-actions>
     </q-card>

@@ -6,11 +6,12 @@
   "author": "Javier Sanhueza Mejías <javier.sanhueza.mejias@gmail.com>",
   "private": true,
   "scripts": {
+    "dev": "cross-env ENV=dev quasar dev",
+    "build": "cross-env ENV=prod quasar build",
+    "qa": "cross-env ENV=qa quasar dev",
     "lint": "eslint --ext .js,.ts,.vue ./",
     "format": "prettier --write \"**/*.{js,ts,vue,scss,html,md,json}\" --ignore-path .gitignore",
-    "test": "echo \"No test specified\" && exit 0",
-    "dev": "quasar dev",
-    "build": "quasar build"
+    "test": "echo \"No test specified\" && exit 0"
   },
   "dependencies": {
     "@quasar/extras": "^1.16.4",
@@ -33,6 +34,7 @@
     "@typescript-eslint/eslint-plugin": "^7.16.0",
     "@typescript-eslint/parser": "^7.16.0",
     "autoprefixer": "^10.4.2",
+    "cross-env": "^7.0.3",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-vue": "^9.0.0",

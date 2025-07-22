@@ -44,9 +44,21 @@ const routes: RouteRecordRaw[] = [
         meta: { isProtectedRoute: true }
       },
       {
-        path: 'companies',
-        component: () => import('pages/private/CompanyPage/CompanyPage.vue'),
-        name: 'Companies',
+        path: 'residents',
+        component: () => import('pages/private/ResidentPage/ResidentPage.vue'),
+        name: 'ResidentPage',
+        meta: { isProtectedRoute: true }
+      },
+      {
+        path: 'new-resident',
+        component: () => import('pages/private/ResidentPage/NewResidentPage.vue'),
+        name: 'NewResidentPage',
+        meta: { isProtectedRoute: true }
+      },
+      {
+        path: 'edit-resident/:idResident',
+        component: () => import('pages/private/ResidentPage/EditResidentPage.vue'),
+        name: 'EditResidentPage',
         meta: { isProtectedRoute: true }
       },
       {

@@ -135,13 +135,3 @@ export default defineComponent({
 })
 
 </script>
-
-<style>
-.background-header {
-  background: linear-gradient(
-    to right,
-    #b224ef,
-    #7579ff
-  ); /* Gradiente de color */
-}
-</style>

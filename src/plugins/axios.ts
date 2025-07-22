@@ -42,7 +42,7 @@ apiClient.interceptors.response.use(
 
     Notify.create({
       type: 'negative',
-      message: error.response?.data?.message || 'Error desconocido',
+      message: `${error.response?.data?.message} ${error.response.data.error ? `- ${error.response.data.error}` : ''}` || 'Error desconocido',
       position: 'top',
       timeout: 3000
     });

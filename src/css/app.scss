@@ -1,3 +1,25 @@
+// Gradiente para tarjetas o formularios (como .wrap-login100)
+$gradient-main: linear-gradient(
+    to top,
+    #7BC6A4, // Verde menta
+    #4A90E2  // Azul suave
+);
+
+// Gradiente para encabezados o barras superiores (como .background-header)
+$gradient-header: linear-gradient(
+    to right,
+    #7BC6A4, // Verde menta
+    #4A90E2  // Azul suave
+);
+
+// Gradiente alternativo para fondos o secciones destacadas
+$gradient-alt: linear-gradient(
+    135deg,
+    #4A90E2,
+    #D883B7
+);
+
+
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
@@ -25,10 +47,9 @@ input:-webkit-autofill:active {
   background-size: cover;
   position: relative;
   z-index: 1;
-  background-color: rgba(255, 255, 255, 0.9);
 }
 .bg-page {
-  background-image: url('assets/login-background.webp');
+  background-image: url('assets/login-image3.webp');
   background-size: cover;
   background-position: center;
   height: 100vh;
@@ -39,19 +60,24 @@ input:-webkit-autofill:active {
   border-radius: 10px;
   overflow: hidden;
   padding: 40px;
-  background: linear-gradient(
-      to top,
-      #b224ef,
-      #7579ff
-  ); /* Gradiente de color */
+  background: $gradient-main;
 }
 
+.glass-card {
+  width: 500px;
+  overflow: hidden;
+  padding: 40px;
+  background-color: rgba(255, 255, 255, 0.2); /* Fondo blanco con opacidad */
+  backdrop-filter: blur(40px); /* Efecto borroso */
+  -webkit-backdrop-filter: blur(30px); /* Compatibilidad con Safari */
+  border-radius: 15px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+
 .background-header {
-  background: linear-gradient(
-      to right,
-      #b224ef,
-      #7579ff
-  ); /* Gradiente de color */
+  background: $gradient-header;
 }
 
 .dialog-fullscreen {
