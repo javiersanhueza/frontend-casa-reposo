@@ -93,10 +93,14 @@ export const useResidentStore = defineStore('resident', {
       const companyId = globalMixin.methods.getIdCompany()
       try {
         const formData = new FormData();
-        const residentData = { ...resident ,companyId, photo: null };
+        const residentData = {
+          ...resident,
+          companyId,
+          photo: resident.photo?.includes('https') ? resident.photo : null
+        };
         formData.append('data', JSON.stringify(residentData));
 
-        if (resident.photo) {
+        if (resident.photo && !resident.photo.includes('https')) {
           const blob = globalMixin.methods.dataURLtoBlob(resident.photo);
 
           const mimeType = blob.type;
