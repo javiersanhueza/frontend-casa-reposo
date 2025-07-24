@@ -23,5 +23,6 @@ export interface NewResident {
     rut: string;
     phone: string;
     address: string;
-  }
+  },
+  photo?: string | null | undefined;
 }

@@ -15,8 +15,7 @@ export const useResidentStore = defineStore('resident', {
   }),
 
   actions: {
-    async getResidentsForCompany(state: string = 'all') {
-      console.log(state);
+    async getResidentsForCompany(state: string = 'active') {
       const companyId = globalMixin.methods.getIdCompany()
 
       try {
@@ -48,9 +47,25 @@ export const useResidentStore = defineStore('resident', {
       const companyId = globalMixin.methods.getIdCompany()
 
       try {
+        const formData = new FormData();
+
+        const residentData = { ...resident ,companyId, photo: null };
+        formData.append('data', JSON.stringify(residentData));
+
+        if (resident.photo) {
+          const blob = globalMixin.methods.dataURLtoBlob(resident.photo);
+          formData.append('photo', blob, 'photo.jpg');
+        }
+
         const response: AxiosResponse = await apiClient.post(
           `/${process.env.CONTEXT_API_PRIVATE}/residents`,
-          { ...resident, companyId }
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          }
+
         );
 
         return response.data;
@@ -77,9 +92,31 @@ export const useResidentStore = defineStore('resident', {
     async editResident(idResident: number, resident: NewResident) {
       const companyId = globalMixin.methods.getIdCompany()
       try {
+        const formData = new FormData();
+        const residentData = { ...resident ,companyId, photo: null };
+        formData.append('data', JSON.stringify(residentData));
+
+        if (resident.photo) {
+          const blob = globalMixin.methods.dataURLtoBlob(resident.photo);
+
+          const mimeType = blob.type;
+          const extension = mimeType.split('/')[1];
+
+          console.log(extension);
+
+          const filename = `photo_profile.${extension}`;
+
+          formData.append('photo', blob, filename);
+        }
+
         const response: AxiosResponse = await apiClient.put(
           `/${process.env.CONTEXT_API_PRIVATE}/residents/${idResident}`,
-          { ...resident, companyId }
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          }
         );
 
         return response.data;

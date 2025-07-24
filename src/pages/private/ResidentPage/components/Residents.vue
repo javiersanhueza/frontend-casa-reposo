@@ -42,25 +42,32 @@
       <div class="col-sm-6 col-12 q-my-sm q-px-xs">
         <q-card flat bordered style="height: 100%">
           <q-card-section horizontal>
+
+            <!-- Imagen del residente -->
+            <q-card-section class="q-pr-none" style="width: 100px; display: flex; align-items: center; justify-content: center;">
+              <q-avatar color="grey-5" size="80px">
+                <img v-if="props.row.photo" :src="props.row.photo" alt="Foto del residente" style="border-radius: 50%"/>
+                <q-icon v-else name="person" size="80px" color="grey-7" />
+              </q-avatar>
+            </q-card-section>
+
             <!-- Información del residente -->
             <q-card-section class="col">
               <div class="text-h6 text-primary">
-                {{ props.row.name }} {{ props.row.paternalSurname }}
-                {{ props.row.maternalSurname }}
+                {{ props.row.name }} {{ props.row.paternalSurname }} {{ props.row.maternalSurname }}
               </div>
               <div class="text-caption text-grey-7">
                 <strong>RUT:</strong> {{ props.row.rut }}
               </div>
               <div class="text-caption text-grey-7">
-                <strong>Fecha de nacimiento:</strong>
-                {{ formatDate(props.row.birthDate) }}
+                <strong>Fecha de nacimiento:</strong> {{ formatDate(props.row.birthDate) }}
               </div>
               <div class="text-caption text-grey-7">
-                <strong>Edad:</strong>
-                {{ calculateAge(props.row.birthDate) }} años
+                <strong>Edad:</strong> {{ calculateAge(props.row.birthDate) }} años
               </div>
             </q-card-section>
 
+            <!-- Estado -->
             <q-card-section vertical>
               <q-chip
                 v-if="!props.row.retirementDate"
@@ -77,49 +84,32 @@
 
             <!-- Acciones -->
             <q-separator vertical />
-
             <q-card-actions vertical class="justify-around">
               <q-btn flat round icon="preview" color="secondary" @click="previewResident(props.row)">
-                <q-tooltip
-                  v-if="screen.gt.sm"
-                  anchor="top middle"
-                  self="top middle"
-                >
+                <q-tooltip v-if="screen.gt.sm" anchor="top middle" self="top middle">
                   Ver residente
                 </q-tooltip>
               </q-btn>
               <q-btn dense round flat color="secondary" icon="more_vert">
-                <q-tooltip
-                  v-if="screen.gt.sm"
-                  anchor="top middle"
-                  self="top middle"
-                >
+                <q-tooltip v-if="screen.gt.sm" anchor="top middle" self="top middle">
                   Más acciones
                 </q-tooltip>
-
                 <q-menu fit anchor="bottom right" self="top right">
                   <q-list bordered>
                     <q-item
                       clickable
                       v-ripple
-                      @click="
-                        router.push({
-                          name: 'EditResidentPage',
-                          params: { idResident: props.row.id },
-                        })
-                      "
+                      @click="router.push({ name: 'EditResidentPage', params: { idResident: props.row.id } })"
                       v-close-popup
                       v-if="!props.row.retirementDate"
                     >
                       <q-item-section avatar>
                         <q-icon color="secondary" name="edit" />
                       </q-item-section>
-
                       <q-item-section class="text-grey-7 text-subtitle2">
                         Editar
                       </q-item-section>
                     </q-item>
-
                     <q-item
                       clickable
                       v-ripple
@@ -130,10 +120,9 @@
                       <q-item-section avatar>
                         <q-icon color="secondary" name="exit_to_app" />
                       </q-item-section>
-
-                      <q-item-section class="text-grey-7 text-subtitle2"
-                        >Retirar</q-item-section
-                      >
+                      <q-item-section class="text-grey-7 text-subtitle2">
+                        Retirar
+                      </q-item-section>
                     </q-item>
                   </q-list>
                 </q-menu>
@@ -143,6 +132,7 @@
         </q-card>
       </div>
     </template>
+
   </q-table>
   <div class="row justify-center q-mt-md">
     <q-pagination
@@ -188,7 +178,7 @@ export default defineComponent({
     const showDialogPreview = ref(false);
     const residentStore = useResidentStore(pinia());
     const search = ref('');
-    const state = ref('all');
+    const state = ref('active');
     const router = useRouter();
     const { screen } = useQuasar();
 
