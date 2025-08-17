@@ -32,6 +32,22 @@ export const rutMixin = {
       }
 
       return cleanValue;
+    },
+
+    formatRutMiles(rut: string): string {
+      // Elimina puntos y guiones si existen
+      const cleanRut = rut.replace(/[^\dkK]/g, '').toUpperCase();
+
+      if (cleanRut.length < 2) return cleanRut;
+
+      const body = cleanRut.slice(0, -1);
+      const dv = cleanRut.slice(-1);
+
+      // Agrega puntos de miles
+      const formattedBody = body.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+      return `${formattedBody}-${dv}`;
     }
+
   }
 }

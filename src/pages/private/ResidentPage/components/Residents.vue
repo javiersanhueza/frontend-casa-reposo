@@ -11,6 +11,7 @@
         :options="stateOptions"
         emit-value
         map-options
+        :class="[screen.gt.sm ? '' : 'q-mb-sm']"
       />
     </div>
     <div class="col-sm-4 col-12">
@@ -41,14 +42,20 @@
     <template v-slot:item="props">
       <div class="col-sm-6 col-12 q-my-sm q-px-xs">
         <q-card flat bordered style="height: 100%">
-          <q-card-section horizontal>
+          <q-card-section v-if="screen.gt.sm" horizontal>
 
             <!-- Imagen del residente -->
             <q-card-section class="q-pr-none" style="width: 100px; display: flex; align-items: center; justify-content: center;">
-              <q-avatar color="grey-5" size="80px">
+              <q-avatar color="grey-5" size="80px" v-if="props.row.photo">
                 <img v-if="props.row.photo" :src="props.row.photo" alt="Foto del residente" style="border-radius: 50%"/>
-                <q-icon v-else name="person" size="80px" color="grey-7" />
               </q-avatar>
+              <q-avatar v-else
+                size="80px"
+                color="grey-7"
+                text-color="grey-5"
+                icon="account_circle"
+                font-size="80px"
+              />
             </q-card-section>
 
             <!-- Información del residente -->
@@ -57,7 +64,7 @@
                 {{ props.row.name }} {{ props.row.paternalSurname }} {{ props.row.maternalSurname }}
               </div>
               <div class="text-caption text-grey-7">
-                <strong>RUT:</strong> {{ props.row.rut }}
+                <strong>RUT:</strong> {{ formatRutMiles(props.row.rut) }}
               </div>
               <div class="text-caption text-grey-7">
                 <strong>Fecha de nacimiento:</strong> {{ formatDate(props.row.birthDate) }}
@@ -114,6 +121,19 @@
                       clickable
                       v-ripple
                       v-close-popup
+                      @click="router.push({ name: 'ClinicalHistoryPage', params: { idResident: props.row.id } })"
+                    >
+                      <q-item-section avatar>
+                        <q-icon color="secondary" name="assignment" />
+                      </q-item-section>
+                      <q-item-section class="text-grey-7 text-subtitle2">
+                        Antecedentes clínicos
+                      </q-item-section>
+                    </q-item>
+                    <q-item
+                      clickable
+                      v-ripple
+                      v-close-popup
                       @click="openRetirement(props.row)"
                       v-if="!props.row.retirementDate"
                     >
@@ -129,6 +149,112 @@
               </q-btn>
             </q-card-actions>
           </q-card-section>
+
+          <q-card-section v-else class="q-pa-sm">
+            <div class="column q-gutter-sm">
+              <!-- Imagen del residente -->
+              <div class="row items-center justify-center">
+                <q-avatar size="80px" v-if="props.row.photo">
+                  <img :src="props.row.photo" alt="Foto del residente" style="border-radius: 50%" />
+                </q-avatar>
+                <q-avatar v-else size="80px" color="grey-7" text-color="grey-5" icon="account_circle" font-size="80px" />
+              </div>
+
+              <!-- Información del residente -->
+              <div class="column q-gutter-xs text-center">
+                <div class="text-h6 text-primary text-center">
+                  {{ props.row.name }} {{ props.row.paternalSurname }} {{ props.row.maternalSurname }}
+                </div>
+                <div class="text-caption text-grey-7">
+                  <strong>RUT:</strong> {{ formatRutMiles(props.row.rut) }}
+                </div>
+                <div class="text-caption text-grey-7">
+                  <strong>Fecha de nacimiento:</strong> {{ formatDate(props.row.birthDate) }}
+                </div>
+                <div class="text-caption text-grey-7">
+                  <strong>Edad:</strong> {{ calculateAge(props.row.birthDate) }} años
+                </div>
+              </div>
+
+              <!-- Estado -->
+              <div class="row justify-center q-mt-sm">
+                <q-chip
+                  v-if="!props.row.retirementDate"
+                  color="green"
+                  text-color="white"
+                  size="12px"
+                >
+                  Activo
+                </q-chip>
+                <q-chip v-else color="red" text-color="white" size="12px">
+                  Retirado
+                </q-chip>
+              </div>
+
+              <!-- Acciones -->
+              <div class="row justify-around q-mt-sm">
+                <q-btn flat round icon="preview" color="secondary" @click="previewResident(props.row)">
+                  <q-tooltip v-if="screen.gt.sm" anchor="top middle" self="top middle">
+                    Ver residente
+                  </q-tooltip>
+                </q-btn>
+
+                <q-btn dense round flat color="secondary" icon="more_vert">
+                  <q-tooltip v-if="screen.gt.sm" anchor="top middle" self="top middle">
+                    Más acciones
+                  </q-tooltip>
+                  <q-menu fit anchor="bottom right" self="top right">
+                    <q-list bordered>
+                      <q-item
+                        clickable
+                        v-ripple
+                        @click="router.push({ name: 'EditResidentPage', params: { idResident: props.row.id } })"
+                        v-close-popup
+                        v-if="!props.row.retirementDate"
+                      >
+                        <q-item-section avatar>
+                          <q-icon color="secondary" name="edit" />
+                        </q-item-section>
+                        <q-item-section class="text-grey-7 text-subtitle2">
+                          Editar
+                        </q-item-section>
+                      </q-item>
+
+                      <q-item
+                        clickable
+                        v-ripple
+                        v-close-popup
+                        @click="router.push({ name: 'ClinicalHistoryPage', params: { idResident: props.row.id } })"
+                      >
+                        <q-item-section avatar>
+                          <q-icon color="secondary" name="assignment" />
+                        </q-item-section>
+                        <q-item-section class="text-grey-7 text-subtitle2">
+                          Antecedentes clínicos
+                        </q-item-section>
+                      </q-item>
+
+                      <q-item
+                        clickable
+                        v-ripple
+                        v-close-popup
+                        @click="openRetirement(props.row)"
+                        v-if="!props.row.retirementDate"
+                      >
+                        <q-item-section avatar>
+                          <q-icon color="secondary" name="exit_to_app" />
+                        </q-item-section>
+                        <q-item-section class="text-grey-7 text-subtitle2">
+                          Retirar
+                        </q-item-section>
+                      </q-item>
+                    </q-list>
+                  </q-menu>
+                </q-btn>
+              </div>
+            </div>
+          </q-card-section>
+
         </q-card>
       </div>
     </template>
@@ -165,13 +291,14 @@ import pinia from 'src/stores';
 import { globalMixin } from 'src/mixins/globalMixin';
 import RetirementResidentDialog from 'pages/private/ResidentPage/components/RetirementResidentDialog.vue';
 import PreviewResidentDialog from 'pages/private/ResidentPage/components/PreviewResidentDialog.vue';
+import { rutMixin } from 'src/mixins/rutMixin';
 
 export default defineComponent({
   name: 'ResidentsTable',
 
   components: { PreviewResidentDialog, RetirementResidentDialog },
 
-  mixins: [globalMixin],
+  mixins: [globalMixin, rutMixin],
 
   setup() {
     const showDialogRetirement = ref(false);

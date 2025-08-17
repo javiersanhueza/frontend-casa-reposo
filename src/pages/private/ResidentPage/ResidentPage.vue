@@ -1,57 +1,59 @@
 <template>
-  <div class="text-h6 text-grey-7 q-mb-sm">Residentes</div>
+  <q-page>
+    <div class="text-h6 text-grey-7 q-mb-sm">Residentes</div>
 
-  <q-card class="q-pa-md" flat style="border-radius: 10px">
-    <q-card-section>
-      <residents-table />
-    </q-card-section>
-  </q-card>
+    <q-card class="q-pa-md" flat style="border-radius: 10px">
+      <q-card-section>
+        <residents-table />
+      </q-card-section>
+    </q-card>
 
-  <div>
+    <div>
+      <!--
+      <q-input
+        filled
+        type="textarea"
+        label="Transcripción"
+        v-model="transcriptText"
+        class="q-mt-md"
+        autogrow
+      >
+        <template v-slot:append>
+          <q-btn @click="startListening" label="🎤 Hablar" color="primary" />
+          <q-btn @click="stopListening" label="🛑 Detener" color="negative" />
+          <q-btn @click="clearTranscript" label="🧹 Limpiar" color="grey-7" class="q-ml-sm" />
+
+          <q-spinner-bars
+            color="primary"
+            size="2em"
+            v-if="isListening"
+          />
+        </template>
+      </q-input>
+      -->
+    </div>
+
+    <q-page-sticky position="bottom-right" :offset="[18, 18]">
+      <q-tooltip anchor="center left" self="center right" :offset="[10, 10]">
+        Nuevo residente
+      </q-tooltip>
+      <q-btn
+        @click="router.push({ name: 'NewResidentPage' })"
+        fab
+        icon="add"
+        color="primary"
+      />
+    </q-page-sticky>
+
     <!--
-    <q-input
-      filled
-      type="textarea"
-      label="Transcripción"
-      v-model="transcriptText"
-      class="q-mt-md"
-      autogrow
-    >
-      <template v-slot:append>
-        <q-btn @click="startListening" label="🎤 Hablar" color="primary" />
-        <q-btn @click="stopListening" label="🛑 Detener" color="negative" />
-        <q-btn @click="clearTranscript" label="🧹 Limpiar" color="grey-7" class="q-ml-sm" />
 
-        <q-spinner-bars
-          color="primary"
-          size="2em"
-          v-if="isListening"
-        />
-      </template>
-    </q-input>
-    -->
-  </div>
-
-  <q-page-sticky position="bottom-right" :offset="[18, 18]">
-    <q-tooltip anchor="center left" self="center right" :offset="[10, 10]">
-      Nuevo residente
-    </q-tooltip>
-    <q-btn
-      @click="router.push({ name: 'NewResidentPage' })"
-      fab
-      icon="add"
-      color="primary"
+    <new-company-dialog
+      title="Nueva Empresa"
+      v-model:showDialog="showDialog"
+      @accept="getResidents"
     />
-  </q-page-sticky>
-
-  <!--
-
-  <new-company-dialog
-    title="Nueva Empresa"
-    v-model:showDialog="showDialog"
-    @accept="getResidents"
-  />
-  -->
+    -->
+  </q-page>
 </template>
 
 <script lang="ts">

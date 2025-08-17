@@ -62,6 +62,12 @@ const routes: RouteRecordRaw[] = [
         meta: { isProtectedRoute: true }
       },
       {
+        path: 'clinical-history/:idResident',
+        component: () => import('pages/private/ClinicalHistoryPage/ClinicalHistoryPage.vue'),
+        name: 'ClinicalHistoryPage',
+        meta: { isProtectedRoute: true }
+      },
+      {
         path: 'accidents',
         component: () => import('pages/private/AccidentsPage/AccidentsPage.vue'),
         name: 'Accidents',
