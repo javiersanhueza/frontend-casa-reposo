@@ -12,8 +12,8 @@
       </q-card-section>
 
       <q-card-actions align="right" class="q-pa-md row no-wrap items-center" :class="{'dialog-actions': $q.screen.xs}" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-        <q-btn outline label="Cancelar" color="white" text-color="purple-6" @click="internalDialog = false" />
-        <q-btn unelevated label="Aceptar" text-color="white" class="background-header" @click="actionAccept()" />
+        <q-btn outline label="Cancelar" color="white" text-color="primary" @click="internalDialog = false" />
+        <q-btn unelevated label="Aceptar" text-color="white" class="bg-primary" @click="actionAccept()" />
       </q-card-actions>
     </q-card>
   </q-dialog>

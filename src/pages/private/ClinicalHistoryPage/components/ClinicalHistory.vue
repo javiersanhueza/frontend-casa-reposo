@@ -29,19 +29,19 @@
         </q-card-section>
 
         <q-card-section class="q-pt-none">
-          <div class="text-subtitle2 text-primary">
+          <div class="text-h6 text-primary">
             {{ resident?.name }} {{ resident?.paternalSurname }}
             {{ resident?.maternalSurname }}
           </div>
 
           <div class="q-mt-sm">
-            <div class="text-caption text-grey-7">
+            <div class="text-grey-7">
               <strong>RUT:</strong>
               {{
                 resident?.rut ? formatRutMiles(resident?.rut) : 'No disponible'
               }}
             </div>
-            <div class="text-caption text-grey-7">
+            <div class="text-grey-7">
               <strong>Fecha de nacimiento:</strong>
               {{
                 resident?.birthDate
@@ -49,7 +49,7 @@
                   : 'No disponible'
               }}
             </div>
-            <div class="text-caption text-grey-7">
+            <div class="text-grey-7">
               <strong>Edad:</strong>
               {{
                 resident?.birthDate
@@ -79,19 +79,19 @@
         <q-separator />
 
         <q-card-section class="q-gutter-md">
-          <div class="text-caption text-grey-7">
+          <div class="text-grey-7">
             <strong>Enfermedades crónicas:</strong>
             {{ clinicalHistory?.chronicDiseases || 'No disponible' }}
           </div>
-          <div class="text-caption text-grey-7">
+          <div class="text-grey-7">
             <strong>Medicamentos:</strong>
             {{ clinicalHistory?.medications || 'No disponible' }}
           </div>
-          <div class="text-caption text-grey-7">
+          <div class="text-grey-7">
             <strong>Fracturas:</strong>
             {{ clinicalHistory?.fractures || 'No disponible' }}
           </div>
-          <div class="text-caption text-grey-7">
+          <div class="text-grey-7">
             <strong>Cirugías:</strong>
             {{ clinicalHistory?.surgeries || 'No disponible' }}
           </div>
@@ -107,15 +107,27 @@
                 <strong>Hábitos</strong>
               </div>
               <div class="q-pl-sm">
-                <div class="text-caption text-grey-7 q-mb-xs">
+                <div class="text-grey-7 q-mb-xs">
                   <strong>Tabaco:</strong>
-                  {{ clinicalHistory?.tobacco === true ? 'Si' : clinicalHistory?.tobacco === false ? 'No' : 'No disponible' }}
+                  {{
+                    clinicalHistory?.tobacco === true
+                      ? 'Si'
+                      : clinicalHistory?.tobacco === false
+                      ? 'No'
+                      : 'No disponible'
+                  }}
                 </div>
-                <div class="text-caption text-grey-7 q-mb-xs">
+                <div class="text-grey-7 q-mb-xs">
                   <strong>Alcohol:</strong>
-                  {{ clinicalHistory?.alcohol === true ? 'Si' : clinicalHistory?.alcohol === false ? 'No' : 'No disponible' }}
+                  {{
+                    clinicalHistory?.alcohol === true
+                      ? 'Si'
+                      : clinicalHistory?.alcohol === false
+                      ? 'No'
+                      : 'No disponible'
+                  }}
                 </div>
-                <div class="text-caption text-grey-7">
+                <div class="text-grey-7">
                   <strong>Otros:</strong>
                   {{ clinicalHistory?.otherHabits || 'No disponible' }}
                 </div>
@@ -128,7 +140,7 @@
                 <strong>Datos físicos</strong>
               </div>
               <div class="q-pl-sm">
-                <div class="text-caption text-grey-7 q-mb-xs">
+                <div class="text-grey-7 q-mb-xs">
                   <strong>Peso:</strong>
                   {{
                     clinicalHistory?.weight
@@ -136,7 +148,7 @@
                       : 'No disponible'
                   }}
                 </div>
-                <div class="text-caption text-grey-7 q-mb-xs">
+                <div class="text-grey-7 q-mb-xs">
                   <strong>Estatura:</strong>
                   {{
                     clinicalHistory?.stature
@@ -144,7 +156,7 @@
                       : 'No disponible'
                   }}
                 </div>
-                <div class="text-caption text-grey-7">
+                <div class="text-grey-7">
                   <strong>IMC:</strong>
                   {{ calculateBMI() ? calculateBMI() : 'No disponible' }}
                 </div>
@@ -153,10 +165,19 @@
           </div>
         </q-card-section>
       </q-card>
+
+      <q-card class="q-pa-md q-mt-md" style="border-radius: 10px">
+        <q-card-section>
+          <file-attachment-clinical-history />
+        </q-card-section>
+      </q-card>
     </div>
   </div>
 
-  <clinical-history-dialog v-model:show-dialog="showDialogClinicalHistory" :clinical-history-edit="clinicalHistory" />
+  <clinical-history-dialog
+    v-model:show-dialog="showDialogClinicalHistory"
+    :clinical-history-edit="clinicalHistory"
+  />
 </template>
 
 <script lang="ts">
@@ -171,10 +192,11 @@ import { rutMixin } from 'src/mixins/rutMixin';
 import { useQuasar } from 'quasar';
 import ClinicalHistoryDialog from 'pages/private/ClinicalHistoryPage/components/ClinicalHistoryDIalog.vue';
 import { useClinicalHistoryStore } from 'stores/clinicalHistory';
+import FileAttachmentClinicalHistory from 'pages/private/ClinicalHistoryPage/components/FilesAttachmentClinicalHistory.vue';
 
 export default defineComponent({
   name: 'ClinicalHistory',
-  components: { ClinicalHistoryDialog },
+  components: { FileAttachmentClinicalHistory, ClinicalHistoryDialog },
 
   mixins: [globalMixin, rutMixin],
 
@@ -192,13 +214,8 @@ export default defineComponent({
     const calculateBMI = () => {
       const weight = clinicalHistory?.value?.weight;
       const heightCm = clinicalHistory?.value?.stature;
-      if (
-        weight !== null &&
-        heightCm !== null &&
-        weight > 0 &&
-        heightCm > 0
-      ) {
-        const heightM = heightCm / 100
+      if (weight !== null && heightCm !== null && weight > 0 && heightCm > 0) {
+        const heightM = heightCm / 100;
         return +(weight / (heightM * heightM)).toFixed(1);
       } else {
         return null;
@@ -207,14 +224,18 @@ export default defineComponent({
 
     const getResidentByIdAndClinicalHistory = async () => {
       resident.value = await residentStore.getResidentById(Number(idResident));
-      await clinicalHistoryStore.getClinicalHistoryForResident(Number(idResident));
+      await clinicalHistoryStore.getClinicalHistoryForResident(
+        Number(idResident)
+      );
     };
 
-    const clinicalHistory = computed(() => clinicalHistoryStore.clinicalHistory ?? []);
+    const clinicalHistory = computed(
+      () => clinicalHistoryStore.clinicalHistory ?? []
+    );
 
     const openDialog = () => {
       showDialogClinicalHistory.value = true;
-    }
+    };
 
     onMounted(async () => {
       await getResidentByIdAndClinicalHistory();
@@ -229,7 +250,7 @@ export default defineComponent({
       clinicalHistoryStore,
 
       calculateBMI,
-      openDialog
+      openDialog,
     };
   },
 });
