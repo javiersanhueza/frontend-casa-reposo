@@ -2,7 +2,7 @@
   "name": "frontend",
   "version": "0.0.1",
   "description": "dashboard",
-  "productName": "Resultados Operacionales",
+  "productName": "Casa reposo app",
   "author": "Javier Sanhueza Mejías <javier.sanhueza.mejias@gmail.com>",
   "private": true,
   "scripts": {

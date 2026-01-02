@@ -5,7 +5,7 @@ export const globalMixin = {
     getNameCompany(): string {
       const userData = localStorage.getItem('user');
       if (userData) {
-        return JSON.parse(userData).company.companyName;
+        return '' /*JSON.parse(userData).company.companyName*/;
       }
       return '';
     },

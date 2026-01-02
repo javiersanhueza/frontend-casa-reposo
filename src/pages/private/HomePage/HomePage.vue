@@ -1,5 +1,6 @@
 <template>
   <q-page>
+    <!--
     <div class="q-gutter-md">
       <months-component />
       <statistics-month-component />
@@ -74,18 +75,20 @@
         </div>
       </div>
     </div>
+
+    -->
   </q-page>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import { Line } from 'vue-chartjs';
+// import { Line } from 'vue-chartjs';
 import { Chart, registerables } from 'chart.js';
 
-import MonthsComponent from 'pages/private/HomePage/components/Months.vue';
-import StatisticsMonthComponent from 'pages/private/HomePage/components/StatisticsMonth.vue';
-import LastRecordedAccidentComponent from 'pages/private/HomePage/components/LastRecordedAccident.vue';
-import CardStatisticComponent from 'pages/private/HomePage/components/CardStatistic.vue';
+// import MonthsComponent from 'pages/private/HomePage/components/Months.vue';
+// import StatisticsMonthComponent from 'pages/private/HomePage/components/StatisticsMonth.vue';
+// import LastRecordedAccidentComponent from 'pages/private/HomePage/components/LastRecordedAccident.vue';
+// import CardStatisticComponent from 'pages/private/HomePage/components/CardStatistic.vue';
 
 Chart.register(...registerables);
 
@@ -93,11 +96,11 @@ export default defineComponent({
   name: 'HomePage',
 
   components: {
-    CardStatisticComponent,
+    /*CardStatisticComponent,
     LastRecordedAccidentComponent,
     StatisticsMonthComponent,
     MonthsComponent,
-    LineChart: Line
+    LineChart: Line*/
   },
 
   setup() {

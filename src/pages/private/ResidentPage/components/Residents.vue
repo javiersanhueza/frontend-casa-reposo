@@ -40,7 +40,7 @@
     no-data-label="Sin datos disponibles"
   >
     <template v-slot:item="props">
-      <div class="col-sm-6 col-12 q-my-sm q-px-xs">
+      <div class="col-12 q-my-sm q-px-xs">
         <q-card flat bordered style="height: 100%">
           <q-card-section v-if="screen.gt.sm" horizontal>
 

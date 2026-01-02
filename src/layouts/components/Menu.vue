@@ -29,7 +29,7 @@
           />
 
           <div class="col text-caption text-grey-7 text-right text-weight-bold">
-            {{ user?.name }}
+            {{ user?.firstName }} {{ user?.firstSurname }}
           </div>
           <div class="col text-caption text-grey-7 text-right">
             {{ user?.email }}
@@ -56,7 +56,7 @@
           />
 
           <div class="col text-caption text-right text-grey-7 text-weight-bold">
-            {{ user?.name }}
+            {{ user?.firstName }} {{ user?.firstSurname }}
           </div>
           <div class="col text-caption text-right text-grey-7">
             {{ user?.email }}
@@ -92,7 +92,6 @@
 import { defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-import { UserLogin } from 'src/interfaces/auth/auth.interfaces';
 import { Menu } from 'layouts/interfaces';
 
 export default defineComponent({
@@ -100,7 +99,9 @@ export default defineComponent({
 
   setup() {
     const router = useRouter();
-    const user: UserLogin = JSON.parse(localStorage.getItem('user')!);
+    const user = JSON.parse(localStorage.getItem('user')!);
+
+    console.log(user);
     const menu = ref(false);
 
     const logOut = () => {

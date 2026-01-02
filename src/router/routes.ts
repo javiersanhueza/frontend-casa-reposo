@@ -90,6 +90,16 @@ const routes: RouteRecordRaw[] = [
         component: () => import('pages/private/OptionsMaintainerPage/OptionsMaintainerPage.vue'),
         name: 'OptionMaintainer',
         meta: { isProtectedRoute: true }
+      },
+      {
+        path: 'users',
+        component: () => import('pages/private/UsersPage/UsersPage.vue'),
+        name: 'UsersPage',
+        meta: {
+          isProtectedRoute: true,
+          allowedRoles: ['superUser', 'admin']
+        }
+
       }
     ]
   },

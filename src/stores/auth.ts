@@ -4,7 +4,6 @@ import { AxiosResponse } from 'axios';
 import apiClient from 'src/plugins/axios';
 import {
   LoginResponse,
-  UserLogin,
   RegisterResponse,
   DefaultResponse
 } from 'src/interfaces/auth/auth.interfaces';
@@ -12,7 +11,7 @@ import { Notify } from 'quasar';
 
 export interface AuthState {
   token: string | null,
-  user: UserLogin | null
+  user: any | null
 }
 
 export const useAuthStore = defineStore('auth', {
@@ -32,10 +31,19 @@ export const useAuthStore = defineStore('auth', {
           `/${process.env.CONTEXT_API_AUTH}/login`,
           { email, password }
         );
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
-        this.token = response.data.token;
-        this.user = response.data.user;
+
+        const user = {
+          firstName: response.data.data.firstName,
+          firstSurname: response.data.data.firstSurname,
+          photo: response.data.data.photo,
+          roles: response.data.data.roles
+        }
+
+        localStorage.setItem('token', response.data.data.token);
+        localStorage.setItem('user', JSON.stringify(user));
+
+        this.token = response.data.data.token;
+        this.user = user;
       } catch (error) {
         console.log('Error en el login:', error);
       }
