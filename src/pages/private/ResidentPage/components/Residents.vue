@@ -64,7 +64,7 @@
                 {{ props.row.name }} {{ props.row.paternalSurname }} {{ props.row.maternalSurname }}
               </div>
               <div class="text-caption text-grey-7">
-                <strong>RUT:</strong> {{ formatRutMiles(props.row.rut) }}
+                <strong>RUT:</strong>
               </div>
               <div class="text-caption text-grey-7">
                 <strong>Fecha de nacimiento:</strong> {{ formatDate(props.row.birthDate) }}
@@ -166,7 +166,7 @@
                   {{ props.row.name }} {{ props.row.paternalSurname }} {{ props.row.maternalSurname }}
                 </div>
                 <div class="text-caption text-grey-7">
-                  <strong>RUT:</strong> {{ formatRutMiles(props.row.rut) }}
+                  <strong>RUT:</strong>
                 </div>
                 <div class="text-caption text-grey-7">
                   <strong>Fecha de nacimiento:</strong> {{ formatDate(props.row.birthDate) }}
@@ -291,14 +291,13 @@ import pinia from 'src/stores';
 import { globalMixin } from 'src/mixins/globalMixin';
 import RetirementResidentDialog from 'pages/private/ResidentPage/components/RetirementResidentDialog.vue';
 import PreviewResidentDialog from 'pages/private/ResidentPage/components/PreviewResidentDialog.vue';
-import { rutMixin } from 'src/mixins/rutMixin';
 
 export default defineComponent({
   name: 'ResidentsTable',
 
   components: { PreviewResidentDialog, RetirementResidentDialog },
 
-  mixins: [globalMixin, rutMixin],
+  mixins: [globalMixin],
 
   setup() {
     const showDialogRetirement = ref(false);

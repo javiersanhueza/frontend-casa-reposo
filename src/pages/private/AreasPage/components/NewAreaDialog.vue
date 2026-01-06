@@ -31,7 +31,6 @@
 import { defineComponent, ref, watch } from 'vue';
 import { Notify, QForm } from 'quasar';
 
-import { rutMixin } from 'src/mixins/rutMixin';
 import pinia from 'src/stores';
 import { useAreaStore } from 'stores/area';
 
@@ -58,8 +57,6 @@ export default defineComponent({
       type: Number
     },
   },
-
-  mixins: [rutMixin],
 
   emits: ['update:showDialog', 'accept'],
 

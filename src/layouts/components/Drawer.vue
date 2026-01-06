@@ -102,7 +102,7 @@ export default defineComponent({
 
     const addRestrictedMenus = () => {
       if (hasRole(['superUser', 'admin'])) {
-        menuConfig.value.push({
+        menuConfig.value.unshift({
           id: 3,
           to: 'UsersPage',
           icon: 'manage_accounts',

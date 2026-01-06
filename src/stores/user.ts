@@ -1,30 +1,86 @@
 import { defineStore } from 'pinia';
 import { AxiosResponse } from 'axios';
 import apiClient from 'src/plugins/axios';
+import { CreateUserPayload, User } from 'src/interfaces/users.interface';
 
 interface UserState {
-  users: any[] | null;
+  users: User[] | null;
+  limit: number;
+  offset: number;
+  order: string;
+  orderBy: string;
+  totalPage: number | null
 }
 
 export const useUserStore = defineStore('user', {
   state: (): UserState => ({
-    users: null
+    users: [],
+    limit: 10,
+    offset: 0,
+    order: 'ASC',
+    orderBy: 'run',
+    totalPage: null
   }),
 
   actions: {
     async getUsersPagination() {
+      try {
+        this.users = [];
+        const response: AxiosResponse<{ data: { count: number, rows: User[] }, statusCode: number, send: string }> = await apiClient.post(
+          '/users/pagination',
+          {
+            limit: this.limit,
+            offset: this.offset,
+            order: this.order,
+            orderBy: this.orderBy
+          }
+        );
 
+        const count = response.data.data.count;
+        this.users = response.data.data.rows;
+        this.totalPage = count / this.limit < 1 ? 1 : Math.ceil(count / this.limit);
+      } catch (error) {
+        console.log('Error en getUsersPagination', error);
+      }
     },
 
     async getUsers() {
       try {
-        const response: AxiosResponse = await apiClient.get(
+        const response: AxiosResponse<{ data: User[], statusCode: number, send: string }> = await apiClient.get(
           '/users'
         );
 
         console.log(response);
       } catch (error) {
         console.log('Error en getUsers', error);
+      }
+    },
+
+    async createSuperUser(newUser: CreateUserPayload) {
+      try {
+        const response: AxiosResponse = await apiClient.post(
+          '/users/superuser',
+          newUser
+        );
+
+        console.log(response);
+        return response;
+      } catch (error) {
+        console.log('Error en createSuperUser', error);
+      }
+    },
+
+    async createAdminUser(newUser: CreateUserPayload) {
+      try {
+        const response: AxiosResponse = await apiClient.post(
+          '/users/admin',
+          newUser
+        );
+
+        console.log(response);
+        return response;
+      } catch (error) {
+        console.log('Error en createAdminUser', error);
       }
     }
   }

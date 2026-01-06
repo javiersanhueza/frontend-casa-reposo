@@ -19,21 +19,65 @@
       </q-tooltip>
     </q-btn>
   </q-page-sticky>
+
+  <new-user
+    title="Nuevo usuario"
+    v-model:dialogVisible="dialogVisible"
+    @submitted="handleUserCreate"
+  />
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
+import { Notify } from 'quasar';
+
 import UsersComponent from 'pages/private/UsersPage/components/UsersComponent.vue';
+import NewUser from 'pages/private/UsersPage/components/NewUser.vue';
+import { useUserStore } from 'stores/user';
+import pinia from 'src/stores';
+import { globalMixin } from 'src/mixins/globalMixin';
 
 export default defineComponent({
   name: 'UsersPage',
-  components: { UsersComponent },
+
+  components: { NewUser, UsersComponent },
 
   setup() {
     const dialogVisible = ref(false);
+    const userStore = useUserStore(pinia());
+
+    const rolesUser = globalMixin.methods.getRolesUser();
+
+    const handleUserCreate = async (newUser: any, closeDialog: () => void) => {
+      let response;
+      if (rolesUser.superUser) {
+        if (newUser.role === 'superUser') {
+          response = await userStore.createSuperUser({ ...newUser, secret: 'reposo_jwtkey' });
+        } else if (newUser.role === 'admin') {
+          response = await userStore.createAdminUser(newUser);
+        }
+      }
+
+      console.log(response);
+      closeDialog();
+
+
+      if (response) {
+        closeDialog();
+
+        Notify.create({
+          type: 'positive',
+          message: 'Usuario creado con éxito',
+          position: 'top',
+          timeout: 3000
+        })
+      }
+    }
 
     return {
       dialogVisible,
+
+      handleUserCreate
     };
   },
 });

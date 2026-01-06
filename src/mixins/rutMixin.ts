@@ -1,53 +1,49 @@
-export const rutMixin = {
-  methods: {
-    validateRut(rut: string) {
-      if (!rut) return false;
-      const cleanRut = rut.replace(/[^0-9kK]/g, '').toUpperCase();
-      if (cleanRut.length < 2) return false;
 
-      const body = cleanRut.slice(0, -1);
-      const dv = cleanRut.slice(-1);
+export default function useRutUtils() {
+  function cleanRut(value: string): string {
+    return value.replace(/[^\dkK]/g, '').toUpperCase()
+  }
 
-      let sum = 0;
-      let multiplier = 2;
+  function isValidRut(value: string): boolean {
+    const rut = cleanRut(value)
+    if (rut.length < 2) return false
 
-      for (let i = body.length - 1; i >= 0; i--) {
-        sum += parseInt(body[i]) * multiplier;
-        multiplier = multiplier === 7 ? 2 : multiplier + 1;
-      }
+    const body = rut.slice(0, -1)
+    const dv = rut.slice(-1)
 
-      const calculatedDv = 11 - (sum % 11);
-      const validDv = calculatedDv === 11 ? '0' : calculatedDv === 10 ? 'K' : calculatedDv.toString();
+    let sum = 0
+    let multiplier = 2
 
-      return dv === validDv;
-    },
-
-    formatRut(value: string | number | null) {
-      if (typeof value !== 'string') return '';
-
-      let cleanValue = value.replace(/[^0-9kK]/g, '').toUpperCase();
-
-      if (cleanValue.length > 1) {
-        cleanValue = cleanValue.slice(0, -1) + '-' + cleanValue.slice(-1);
-      }
-
-      return cleanValue;
-    },
-
-    formatRutMiles(rut: string): string {
-      // Elimina puntos y guiones si existen
-      const cleanRut = rut.replace(/[^\dkK]/g, '').toUpperCase();
-
-      if (cleanRut.length < 2) return cleanRut;
-
-      const body = cleanRut.slice(0, -1);
-      const dv = cleanRut.slice(-1);
-
-      // Agrega puntos de miles
-      const formattedBody = body.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-
-      return `${formattedBody}-${dv}`;
+    for (let i = body.length - 1; i >= 0; i--) {
+      sum += parseInt(body[i]) * multiplier
+      multiplier = multiplier === 7 ? 2 : multiplier + 1
     }
 
+    const expectedDv = 11 - (sum % 11)
+    const dvCalc = expectedDv === 11 ? '0' : expectedDv === 10 ? 'K' : expectedDv.toString()
+
+    return dv === dvCalc
   }
+
+  function formatRut(value: string): string {
+    const rut = cleanRut(value)
+    if (rut.length < 2) return value
+
+    const body = rut.slice(0, -1)
+    const dv = rut.slice(-1)
+
+    const formattedBody = body
+      .split('')
+      .reverse()
+      .reduce((acc, digit, index) => {
+        return acc + digit + ((index + 1) % 3 === 0 && index + 1 !== body.length ? '.' : '')
+      }, '')
+      .split('')
+      .reverse()
+      .join('')
+
+    return `${formattedBody}-${dv}`
+  }
+
+  return { isValidRut, formatRut, cleanRut }
 }

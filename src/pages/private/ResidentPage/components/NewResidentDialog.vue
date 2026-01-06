@@ -17,17 +17,6 @@
               (val: string) => val && val.length > 0 || 'Campo requerido'
             ]"
           />
-          <q-input
-            v-model="rut"
-            label="Rut"
-            lazy-rules
-            :rules="[
-              (val: string) => val && val.length > 0 || 'Campo requerido',
-              (val: string) => validateRut(val) || 'RUT inválido'
-            ]"
-            @update:model-value="rut = formatRut($event)"
-            :disable="isEdit"
-          />
         </q-form>
       </q-card-section>
       <q-card-actions align="right" class="q-pa-md row no-wrap items-center" :class="{'dialog-actions': $q.screen.xs}" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
@@ -42,7 +31,6 @@
 import { defineComponent, ref, watch } from 'vue';
 import { Notify, QForm } from 'quasar';
 
-import { rutMixin } from 'src/mixins/rutMixin';
 import pinia from 'src/stores';
 import { useCompanyStore } from 'stores/company';
 
@@ -72,8 +60,6 @@ export default defineComponent({
       default: false
     }
   },
-
-  mixins: [rutMixin],
 
   emits: ['update:showDialog', 'accept'],
 

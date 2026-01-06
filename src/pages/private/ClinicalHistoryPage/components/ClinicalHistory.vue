@@ -37,9 +37,6 @@
           <div class="q-mt-sm">
             <div class="text-grey-7">
               <strong>RUT:</strong>
-              {{
-                resident?.rut ? formatRutMiles(resident?.rut) : 'No disponible'
-              }}
             </div>
             <div class="text-grey-7">
               <strong>Fecha de nacimiento:</strong>
@@ -188,7 +185,6 @@ import { useResidentStore } from 'stores/resident';
 import pinia from 'src/stores';
 import { NewResident } from 'src/interfaces/residents.interface';
 import { globalMixin } from 'src/mixins/globalMixin';
-import { rutMixin } from 'src/mixins/rutMixin';
 import { useQuasar } from 'quasar';
 import ClinicalHistoryDialog from 'pages/private/ClinicalHistoryPage/components/ClinicalHistoryDIalog.vue';
 import { useClinicalHistoryStore } from 'stores/clinicalHistory';
@@ -198,7 +194,7 @@ export default defineComponent({
   name: 'ClinicalHistory',
   components: { FileAttachmentClinicalHistory, ClinicalHistoryDialog },
 
-  mixins: [globalMixin, rutMixin],
+  mixins: [globalMixin],
 
   setup() {
     const route = useRoute();

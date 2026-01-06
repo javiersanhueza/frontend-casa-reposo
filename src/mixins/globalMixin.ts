@@ -10,6 +10,11 @@ export const globalMixin = {
       return '';
     },
 
+    getRolesUser() {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      return user.roles;
+    },
+
     getIdCompany(): number {
       const user = localStorage.getItem('user');
       if (user) {
