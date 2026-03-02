@@ -3,6 +3,7 @@ export interface Menu {
   to: string;
   icon: string;
   label: string;
+  roles?: string[];
 }
 
 export interface Column<T> {

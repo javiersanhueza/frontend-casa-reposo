@@ -2,31 +2,29 @@ import { defineStore } from 'pinia';
 
 import { AxiosResponse } from 'axios';
 import apiClient from 'src/plugins/axios';
-import { Options } from 'src/interfaces/options.interface';
+import { Regions } from 'src/interfaces/options.interface';
 
 interface OptionState {
-  professions: Options[] | null;
-  religions: Options[] | null;
+  regions: Regions | null;
 }
 
 export const useOptionStore = defineStore('option', {
   state: (): OptionState => ({
-    professions: [],
-    religions: []
+    regions: null
   }),
 
   actions: {
-    async getOptionsResidentForm() {
+    async getComunasRegiones() {
       try {
-        const response: AxiosResponse = await apiClient.get(
-          `/${process.env.CONTEXT_API_PRIVATE}/options/resident-form`
-        )
+        const response: AxiosResponse = await apiClient.get<{ data: Regions }>(
+          '/option/comunasRegiones'
+        );
 
-        this.professions = response.data.professions;
-        this.religions = response.data.religions;
+        this.regions = response.data;
       } catch (error) {
-        console.log('Error en getOptionsResidentForm', error);
+        console.log('Error en getComunasRegiones', error);
       }
+
     }
   }
 })

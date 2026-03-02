@@ -101,7 +101,6 @@ export default defineComponent({
     const router = useRouter();
     const user = JSON.parse(localStorage.getItem('user')!);
 
-    console.log(user);
     const menu = ref(false);
 
     const logOut = () => {

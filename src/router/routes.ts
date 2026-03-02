@@ -99,7 +99,15 @@ const routes: RouteRecordRaw[] = [
           isProtectedRoute: true,
           allowedRoles: ['superUser', 'admin']
         }
-
+      },
+      {
+        path: 'residences',
+        component: () => import('pages/private/ResidencesPage/ResidencesPage.vue'),
+        name: 'ResidencesPage',
+        meta: {
+          isProtectedRoute: true,
+          allowedRoles: ['superUser']
+        }
       }
     ]
   },

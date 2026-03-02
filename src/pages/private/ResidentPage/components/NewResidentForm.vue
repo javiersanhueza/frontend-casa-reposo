@@ -57,7 +57,7 @@ import { useQuasar, date, QSelect, Notify } from 'quasar';
 import { useRouter, useRoute } from 'vue-router';
 
 import pinia from 'src/stores';
-import { useOptionStore } from 'stores/option';
+//import { useOptionStore } from 'stores/option';
 import { useResidentStore } from 'stores/resident';
 import { Options } from 'src/interfaces/options.interface';
 import { NewResident } from 'src/interfaces/residents.interface';
@@ -77,7 +77,7 @@ export default defineComponent({
     const route = useRoute();
     const { screen } = useQuasar();
     const today = date.formatDate(new Date(), 'YYYY/MM/DD');
-    const optionStore = useOptionStore(pinia());
+    //const optionStore = useOptionStore(pinia());
     const residentStore = useResidentStore(pinia());
     const professions = ref<Options[]>([]);
     const filteredProfessions = ref<Options[]>();
@@ -141,9 +141,9 @@ export default defineComponent({
     };
 
     const getOptions = async () => {
-      await optionStore.getOptionsResidentForm();
-      professions.value = optionStore.professions || [];
-      religions.value = optionStore.religions || [];
+      //await optionStore.getOptionsResidentForm();
+      //professions.value = optionStore.professions || [];
+      //religions.value = optionStore.religions || [];
     };
 
     const getResidentById = async () => {

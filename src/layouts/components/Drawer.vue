@@ -65,7 +65,7 @@
 </template>
 
 <script lang="ts">
-import { ref, defineComponent, onMounted } from 'vue';
+import { ref, computed, defineComponent } from 'vue';
 import ItemComponent from 'layouts/components/Item.vue';
 import { Menu } from 'layouts/interfaces';
 import { useRoute } from 'vue-router';
@@ -82,48 +82,58 @@ export default defineComponent({
     const user = userStr ? JSON.parse(userStr) : null;
     const userRoles = user?.roles || {};
 
-    const hasRole = (allowedRoles: string[]) => {
+    const hasRole = (allowedRoles?: string[]) => {
+      if (!allowedRoles || allowedRoles.length === 0) return true;
       return allowedRoles.some(role => userRoles[role] === true);
     };
 
-    const menuResults = ref<Menu[]>([
+    const rawMenuResults: Menu[] = [
       { id: 1, to: 'Home', icon: 'home', label: 'Home' },
-      { id: 1, to: 'ResidentPage', icon: 'elderly', label: 'Residentes' },
-    ]);
+      { id: 2, to: 'ResidentPage', icon: 'elderly', label: 'Residentes' },
+    ];
 
-    const menuConfigCompany = ref<Menu[]>([
-      { id: 1, to: 'Areas', icon: 'store', label: 'Áreas' },
-      { id: 2, to: 'Employee', icon: 'badge', label: 'Trabajadores' }
-    ]);
+    const rawMenuConfigCompany: Menu[] = [
+      { id: 3, to: 'Areas', icon: 'store', label: 'Áreas' },
+      { id: 4, to: 'Employee', icon: 'badge', label: 'Trabajadores' }
+    ];
 
-    const menuConfig = ref<Menu[]>([
-      { id: 2, to: 'OptionMaintainer', icon: 'tune', label: 'Mantenedor de opciones' }
-    ]);
-
-    const addRestrictedMenus = () => {
-      if (hasRole(['superUser', 'admin'])) {
-        menuConfig.value.unshift({
-          id: 3,
-          to: 'UsersPage',
-          icon: 'manage_accounts',
-          label: 'Usuarios'
-        });
+    const rawMenuConfig: Menu[] = [
+      {
+        id: 5,
+        to: 'ResidencesPage',
+        icon: 'domain',
+        label: 'Residencias',
+        roles: ['superUser', 'admin']
+      },
+      {
+        id: 6,
+        to: 'UsersPage',
+        icon: 'manage_accounts',
+        label: 'Usuarios',
+        roles: ['superUser', 'admin']
+      },
+      {
+        id: 7,
+        to: 'OptionMaintainer',
+        icon: 'tune',
+        label: 'Mantenedor de opciones'
       }
-    };
+    ];
+
+    const menuResults = computed(() => rawMenuResults.filter(item => hasRole(item.roles)));
+    const menuConfigCompany = computed(() => rawMenuConfigCompany.filter(item => hasRole(item.roles)));
+    const menuConfig = computed(() => rawMenuConfig.filter(item => hasRole(item.roles)));
 
     const setActive = (to: string) => {
       link.value = to;
     };
 
-    onMounted(() => {
-      addRestrictedMenus();
-    });
-
     return {
       menuResults,
-      menuConfig,
       menuConfigCompany,
+      menuConfig,
       link,
+
       setActive
     };
   }
