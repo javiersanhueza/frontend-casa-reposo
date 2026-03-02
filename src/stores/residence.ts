@@ -51,7 +51,7 @@ export const useResidenceStore = defineStore('residence', {
           '/companies'
         );
 
-        console.log(response);
+        this.residences = response.data.data;
       } catch (error) {
         console.log('Error en getResidences', error);
       }
@@ -59,7 +59,7 @@ export const useResidenceStore = defineStore('residence', {
 
     async createResidence(newCompany: NewCompany) {
       try {
-        const response: AxiosResponse = await apiClient.post<{ data: { data: number; send: string; statusCode: number }}>(
+        const response: AxiosResponse = await apiClient.post<{ data: { data: number; send: string; statusCode: number } }>(
           '/companies',
           newCompany
         );
@@ -72,6 +72,19 @@ export const useResidenceStore = defineStore('residence', {
         console.log('Error en createResidence', error);
       }
     },
+
+    async deleteResidence(residenceId: number) {
+      try {
+        const response: AxiosResponse = await apiClient.delete<{ data: { data: number; send: string; statusCode: number } }>(
+          `/companies/${residenceId}`
+        );
+
+        return response.data;
+      } catch (error) {
+        console.log('Error en deleteResidence', error);
+
+      }
+    }
 
     /* async createAdminUser(newUser: CreateUserPayload) {
       try {

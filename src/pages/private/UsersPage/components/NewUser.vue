@@ -1,106 +1,144 @@
 <template>
-  <q-dialog v-model="internalDialogVisible">
-    <q-card class="q-dialog-plugin my-big-dialog">
-      <q-card-section>
-        <div class="row items-center justify-between">
-          <div class="text-h6 text-grey-7">{{ title }}</div>
-          <q-btn flat round dense icon="close" @click="closeDialog" />
-        </div>
-      </q-card-section>
+  <q-dialog v-model="internalDialogVisible" persistent>
+    <q-card style="width: 800px; max-width: 95vw;" class="q-dialog-plugin rounded-borders">
+
+      <q-toolbar class="bg-primary text-white q-py-sm">
+        <q-avatar>
+          <q-icon name="person_add" size="md" />
+        </q-avatar>
+        <q-toolbar-title class="text-weight-bold text-subtitle1">
+          {{ title || 'Nuevo Usuario' }}
+        </q-toolbar-title>
+        <q-btn flat round dense icon="close" v-close-popup @click="closeDialog">
+          <q-tooltip>Cerrar</q-tooltip>
+        </q-btn>
+      </q-toolbar>
 
       <q-form @submit="onSubmit">
-        <q-card-section>
+        <q-card-section class="scroll" style="max-height: 75vh;">
           <div class="row q-col-gutter-md">
 
+            <div class="col-12 text-subtitle2 text-primary text-uppercase text-weight-bold q-mt-sm row items-center">
+              <q-icon name="badge" class="q-mr-sm" size="20px" /> Datos Personales
+            </div>
+
             <div class="col-12 col-md-6">
               <q-input
-                dense
-                filled
+                outlined
                 v-model="user.firstName"
-                label="Nombre (*)"
+                label="Primer Nombre *"
                 lazy-rules
                 :rules="[(val: string) => !!val || 'Campo requerido']"
-              />
+              >
+                <template v-slot:prepend><q-icon name="person" color="grey-6" /></template>
+              </q-input>
             </div>
 
             <div class="col-12 col-md-6">
               <q-input
-                dense
-                filled
+                outlined
                 v-model="user.secondName"
-                label="Segundo nombre (*)"
+                label="Segundo Nombre *"
                 lazy-rules
                 :rules="[(val: string) => !!val || 'Campo requerido']"
-              />
+              >
+                <template v-slot:prepend><q-icon name="person_outline" color="grey-6" /></template>
+              </q-input>
             </div>
 
             <div class="col-12 col-md-6">
               <q-input
-                dense
-                filled
+                outlined
                 v-model="user.firstSurname"
-                label="Apellido paterno (*)"
+                label="Apellido Paterno *"
                 lazy-rules
                 :rules="[(val: string) => !!val || 'Campo requerido']"
-              />
+              >
+                <template v-slot:prepend><q-icon name="group" color="grey-6" /></template>
+              </q-input>
             </div>
 
             <div class="col-12 col-md-6">
               <q-input
-                dense
-                filled
+                outlined
                 v-model="user.secondSurname"
-                label="Apellido materno (*)"
+                label="Apellido Materno *"
                 lazy-rules
                 :rules="[(val: string) => !!val || 'Campo requerido']"
-              />
+              >
+                <template v-slot:prepend><q-icon name="group_add" color="grey-6" /></template>
+              </q-input>
+            </div>
+
+            <div class="col-12 text-subtitle2 text-primary text-uppercase text-weight-bold q-mt-lg row items-center">
+              <q-icon name="security" class="q-mr-sm" size="20px" /> Acceso y Permisos
             </div>
 
             <div class="col-12 col-md-6">
               <q-input
-                filled
-                dense
+                outlined
                 v-model="user.email"
-                label="Email (*)"
+                label="Correo Electrónico *"
                 lazy-rules
                 :rules="[
                   (val: string) => !!val || 'Campo requerido',
                   (val: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val) || 'Correo inválido'
                 ]"
-              />
+              >
+                <template v-slot:prepend><q-icon name="email" color="grey-6" /></template>
+              </q-input>
             </div>
 
             <div class="col-12 col-md-6">
               <q-input
-                dense
-                filled
+                outlined
                 v-model="user.password"
-                label="Contraseña (*)"
+                label="Contraseña *"
                 type="password"
                 autocomplete="new-password"
                 lazy-rules
                 :rules="[(val: string) => !!val || 'Campo requerido']"
-              />
+              >
+                <template v-slot:prepend><q-icon name="lock" color="grey-6" /></template>
+              </q-input>
             </div>
 
-            <div class="col-12 col-md-6">
+            <div class="col-12">
               <q-select
-                dense
-                filled
+                outlined
                 v-model="user.role"
                 :options="roleOptions"
-                label="Rol (*)"
+                label="Rol de Sistema *"
                 emit-value
                 map-options
+                lazy-rules
                 :rules="[(val: string) => !!val || 'Campo requerido']"
-              />
+              >
+                <template v-slot:prepend><q-icon name="admin_panel_settings" color="grey-6" /></template>
+              </q-select>
             </div>
+
           </div>
         </q-card-section>
 
-        <q-card-actions align="right" class="q-pa-md row no-wrap items-center" :class="{'dialog-actions': $q.screen.xs}" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-          <q-btn outline label="Cancelar" color="white" text-color="primary" @click="closeDialog" />
-          <q-btn unelevated label="Aceptar" text-color="white" color="primary" type="submit" />
+        <q-separator />
+
+        <q-card-actions align="right" class="bg-grey-1 q-px-lg q-py-md">
+          <q-btn
+            flat
+            label="Cancelar"
+            color="grey-8"
+            class="q-px-md"
+            @click="closeDialog"
+          />
+          <q-btn
+            unelevated
+            label="Guardar"
+            color="primary"
+            icon="save"
+            type="submit"
+            class="q-px-md q-ml-sm"
+          />
         </q-card-actions>
       </q-form>
     </q-card>

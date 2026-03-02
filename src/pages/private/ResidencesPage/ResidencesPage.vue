@@ -62,9 +62,11 @@ export default defineComponent({
         Notify.create({
           type: 'positive',
           message: 'Residencia creada con éxito',
-          position: 'top',
+          position: 'top-right',
           timeout: 3000,
         });
+
+        await residenceStore.getResidences();
       }
     };
 

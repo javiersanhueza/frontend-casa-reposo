@@ -1,34 +1,44 @@
 <template>
-  <q-dialog v-model="internalDialogVisible">
-    <q-card class="q-dialog-plugin my-big-dialog">
-      <q-card-section>
-        <div class="row items-center justify-between">
-          <div class="text-h6 text-grey-7">{{ title }}</div>
-          <q-btn flat round dense icon="close" @click="closeDialog" />
-        </div>
-      </q-card-section>
+  <q-dialog v-model="internalDialogVisible" persistent>
+    <q-card style="width: 800px; max-width: 95vw;" class="q-dialog-plugin rounded-borders">
+
+      <q-toolbar class="bg-primary text-white q-py-sm">
+        <q-avatar>
+          <q-icon name="domain_add" size="md" />
+        </q-avatar>
+        <q-toolbar-title class="text-weight-bold text-subtitle1">
+          {{ title || 'Nueva Residencia' }}
+        </q-toolbar-title>
+        <q-btn flat round dense icon="close" v-close-popup @click="closeDialog">
+          <q-tooltip>Cerrar</q-tooltip>
+        </q-btn>
+      </q-toolbar>
 
       <q-form @submit="onSubmit">
-        <q-card-section>
+        <q-card-section class="scroll" style="max-height: 75vh;">
           <div class="row q-col-gutter-md">
 
-            <div class="col-12 col-md-6">
-              <q-input
-                dense
-                filled
-                v-model="residence.name"
-                label="Nombre (*)"
-                lazy-rules
-                :rules="[(val: string) => !!val || 'Campo requerido']"
-              />
+            <div class="col-12 text-subtitle2 text-primary text-uppercase text-weight-bold q-mt-sm row items-center">
+              <q-icon name="info" class="q-mr-sm" size="20px" /> Datos Generales
             </div>
 
             <div class="col-12 col-md-6">
               <q-input
-                dense
-                filled
+                outlined
+                v-model="residence.name"
+                label="Nombre de la Residencia *"
+                lazy-rules
+                :rules="[(val: string) => !!val || 'Campo requerido']"
+              >
+                <template v-slot:prepend><q-icon name="apartment" color="grey-6" /></template>
+              </q-input>
+            </div>
+
+            <div class="col-12 col-md-6">
+              <q-input
+                outlined
                 v-model="residence.rut"
-                label="Rut (*)"
+                label="RUT *"
                 lazy-rules
                 maxlength="12"
                 @update:model-value="onRutInput"
@@ -36,49 +46,55 @@
                   (val: string) => !!val || 'Campo requerido',
                   (val: string) => isValidRut(val) || 'El RUT ingresado no es válido'
                 ]"
-              />
+              >
+                <template v-slot:prepend><q-icon name="badge" color="grey-6" /></template>
+              </q-input>
             </div>
 
             <div class="col-12">
               <q-input
-                dense
-                filled
-                v-model="residence.address"
-                label="Dirección (*)"
+                outlined
+                type="textarea"
+                rows="2"
+                v-model="residence.description"
+                label="Descripción *"
                 lazy-rules
                 :rules="[(val: string) => !!val || 'Campo requerido']"
-              />
+              >
+                <template v-slot:prepend><q-icon name="notes" color="grey-6" /></template>
+              </q-input>
+            </div>
+
+            <div class="col-12 text-subtitle2 text-primary text-uppercase text-weight-bold q-mt-lg row items-center">
+              <q-icon name="place" class="q-mr-sm" size="20px" /> Ubicación Geográfica
             </div>
 
             <div class="col-12 col-md-6">
               <q-select
-                dense
-                filled
+                outlined
                 v-model="residence.region"
                 :options="optionStore.regions?.regions"
                 option-label="name"
                 option-value="name"
                 emit-value
                 map-options
-                label="Región (*)"
+                label="Región *"
                 clearable
                 lazy-rules
                 @clear="residence.region = ''"
                 :rules="[(val: string) => !!val || 'Campo requerido']"
                 @update:model-value="onRegionChange"
               >
+                <template v-slot:prepend><q-icon name="map" color="grey-6" /></template>
                 <template v-slot:selected-item="scope">
                   <div class="ellipsis" style="max-width: 100%;" :title="scope.opt.name">
                     {{ scope.opt.name || scope.opt }}
                   </div>
                 </template>
-
                 <template v-slot:option="scope">
                   <q-item v-bind="scope.itemProps">
                     <q-item-section>
-                      <q-item-label class="ellipsis" :title="scope.opt.name">
-                        {{ scope.opt.name }}
-                      </q-item-label>
+                      <q-item-label class="ellipsis" :title="scope.opt.name">{{ scope.opt.name }}</q-item-label>
                     </q-item-section>
                   </q-item>
                 </template>
@@ -87,33 +103,30 @@
 
             <div class="col-12 col-md-6">
               <q-select
-                dense
-                filled
+                outlined
                 v-model="residence.commune"
                 :options="communeOptions"
                 option-label="name"
                 option-value="name"
                 emit-value
                 map-options
-                label="Comuna (*)"
+                label="Comuna *"
                 clearable
                 lazy-rules
                 @clear="residence.commune = ''"
                 :rules="[(val: string) => !!val || 'Campo requerido']"
                 :disable="!residence.region"
               >
+                <template v-slot:prepend><q-icon name="location_city" color="grey-6" /></template>
                 <template v-slot:selected-item="scope">
                   <div class="ellipsis" style="max-width: 100%;" :title="scope.opt.name">
                     {{ scope.opt.name || scope.opt }}
                   </div>
                 </template>
-
                 <template v-slot:option="scope">
                   <q-item v-bind="scope.itemProps">
                     <q-item-section>
-                      <q-item-label class="ellipsis" :title="scope.opt.name">
-                        {{ scope.opt.name }}
-                      </q-item-label>
+                      <q-item-label class="ellipsis" :title="scope.opt.name">{{ scope.opt.name }}</q-item-label>
                     </q-item-section>
                   </q-item>
                 </template>
@@ -122,25 +135,27 @@
 
             <div class="col-12">
               <q-input
-                dense
-                filled
-                v-model="residence.description"
-                label="Descripción (*)"
+                outlined
+                v-model="residence.address"
+                label="Dirección Exacta *"
                 lazy-rules
                 :rules="[(val: string) => !!val || 'Campo requerido']"
-              />
+              >
+                <template v-slot:prepend><q-icon name="signpost" color="grey-6" /></template>
+              </q-input>
             </div>
 
             <div class="col-12 q-mt-md" v-if="residence.mapUrl">
-              <q-card bordered class="my-card shadow-2">
-                <q-card-section class="q-pb-none">
-                  <div class="text-subtitle2 text-grey-8">Vista Previa de la Ubicación</div>
+              <q-card flat bordered class="bg-grey-1 rounded-borders">
+                <q-card-section class="q-py-sm row items-center">
+                  <q-icon name="travel_explore" color="primary" size="20px" class="q-mr-sm" />
+                  <div class="text-subtitle2 text-grey-8 text-weight-bold">Vista Previa del Mapa</div>
                 </q-card-section>
-                <q-card-section>
+                <q-card-section class="q-pt-none">
                   <iframe
                     width="100%"
-                    height="300"
-                    style="border:0; border-radius: 8px;"
+                    height="250"
+                    style="border:0; border-radius: 8px; box-shadow: inset 0 0 10px rgba(0,0,0,0.1);"
                     loading="lazy"
                     allowfullscreen
                     referrerpolicy="no-referrer-when-downgrade"
@@ -149,12 +164,28 @@
                 </q-card-section>
               </q-card>
             </div>
+
           </div>
         </q-card-section>
 
-        <q-card-actions align="right" class="q-pa-md row no-wrap items-center" :class="{'dialog-actions': $q.screen.xs}" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-          <q-btn outline label="Cancelar" color="white" text-color="primary" @click="closeDialog" />
-          <q-btn unelevated label="Aceptar" text-color="white" color="primary" type="submit" />
+        <q-separator />
+
+        <q-card-actions align="right" class="bg-grey-1 q-px-lg q-py-md">
+          <q-btn
+            flat
+            label="Cancelar"
+            color="grey-8"
+            class="q-px-md"
+            @click="closeDialog"
+          />
+          <q-btn
+            unelevated
+            label="Guardar"
+            color="primary"
+            icon="save"
+            type="submit"
+            class="q-px-md q-ml-sm"
+          />
         </q-card-actions>
       </q-form>
     </q-card>

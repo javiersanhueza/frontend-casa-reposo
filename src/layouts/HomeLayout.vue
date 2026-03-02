@@ -17,7 +17,7 @@
 
         <q-space></q-space>
 
-        <q-badge rounded color="amber-7" :label="getNameCompany()" />
+        <q-badge v-if="!isSuperUser" rounded color="amber-7" :label="getNameCompany()" />
 
         <div class="colum q-ml-sm">
           <menu-component />
@@ -59,12 +59,17 @@ export default defineComponent({
   setup() {
     const leftDrawerOpen = ref(false);
 
+    const userStr = localStorage.getItem('user');
+    const user = userStr ? JSON.parse(userStr) : null;
+    const isSuperUser = user?.roles?.superUser === true;
+
     const toggleLeftDrawer = () => {
       leftDrawerOpen.value = !leftDrawerOpen.value;
     };
 
     return {
       leftDrawerOpen,
+      isSuperUser,
 
       toggleLeftDrawer,
     };
