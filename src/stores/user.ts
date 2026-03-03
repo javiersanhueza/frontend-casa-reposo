@@ -82,6 +82,22 @@ export const useUserStore = defineStore('user', {
       } catch (error) {
         console.log('Error en createAdminUser', error);
       }
+    },
+
+    async createOwner(newUser: any) {
+      try {
+        const response: AxiosResponse = await apiClient.post<{ data: { data: number; send: string; statusCode: number }}>(
+          '/owners',
+          newUser
+        );
+
+        if (response.data.statusCode === 201) {
+          return response.data;
+        }
+
+      } catch (error) {
+        console.log('Error en createOwner', error);
+      }
     }
   }
 })

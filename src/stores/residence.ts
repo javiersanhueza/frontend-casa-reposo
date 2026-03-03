@@ -90,14 +90,13 @@ export const useResidenceStore = defineStore('residence', {
     async updateResidence(companyEdit: NewCompany) {
       try {
         const response: AxiosResponse = await apiClient.put<{ data: { data: number; send: string; statusCode: number } }>(
-          `/companies/${companyEdit.companyId}`,
+          `/companies/update/data/${companyEdit.companyId}`,
           companyEdit
         );
 
         if (response.data.statusCode === 201) {
           return response.data;
         }
-        return response;
       } catch (error) {
         console.log('Error en createResidence', error);
       }
@@ -113,6 +112,22 @@ export const useResidenceStore = defineStore('residence', {
       } catch (error) {
         console.log('Error en deleteResidence', error);
 
+      }
+    },
+
+    async companyOwner(body: any) {
+      try {
+        const response: AxiosResponse = await apiClient.post<{ data: { data: number; send: string; statusCode: number } }>(
+          '/company-owners',
+          body
+        );
+
+        if (response.data.statusCode === 201) {
+          return response.data;
+        }
+        return response;
+      } catch (error) {
+        console.log('Error en companyOwner', error);
       }
     }
   }

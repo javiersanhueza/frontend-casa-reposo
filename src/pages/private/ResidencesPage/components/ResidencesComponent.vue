@@ -25,22 +25,21 @@
     >
       <template v-slot:item="props">
         <div class="q-pa-sm col-12 col-sm-6 col-md-4 col-lg-3">
-          <q-card class="residence-card shadow-3 cursor-pointer" @click="openResidenceDetails(props.row)">
-
-            <div style="height: 150px; position: relative;" class="bg-grey-3 flex flex-center overflow-hidden">
-
+          <q-card
+            class="residence-card shadow-3 cursor-pointer"
+            @click="openResidenceDetails(props.row)"
+          >
+            <div
+              style="height: 150px; position: relative"
+              class="bg-grey-3 flex flex-center overflow-hidden"
+            >
               <img
                 v-if="props.row.imagen"
                 :src="props.row.imagen"
-                style="height: 100%; width: 100%; object-fit: cover;"
-              >
-
-              <q-icon
-                v-else
-                name="apartment"
-                size="80px"
-                color="grey-5"
+                style="height: 100%; width: 100%; object-fit: cover"
               />
+
+              <q-icon v-else name="apartment" size="80px" color="grey-5" />
 
               <div class="absolute-top-right q-pa-sm row q-gutter-sm">
                 <q-btn
@@ -67,7 +66,6 @@
                   <q-tooltip>Eliminar Residencia</q-tooltip>
                 </q-btn>
               </div>
-
             </div>
 
             <q-card-section>
@@ -79,8 +77,15 @@
               </div>
 
               <div class="row items-center text-body2 text-grey-8 q-mt-sm">
-                <q-icon name="location_on" color="negative" size="18px" class="q-mr-xs" />
-                <span class="ellipsis">{{ props.row.commune }}, {{ props.row.city }}</span>
+                <q-icon
+                  name="location_on"
+                  color="negative"
+                  size="18px"
+                  class="q-mr-xs"
+                />
+                <span class="ellipsis"
+                  >{{ props.row.commune }}, {{ props.row.region }}</span
+                >
               </div>
             </q-card-section>
 
@@ -93,7 +98,12 @@
               <q-chip dense color="teal-1" text-color="teal-8" icon="badge">
                 {{ props.row.employees || 0 }} Empleados
               </q-chip>
-              <q-chip dense color="orange-1" text-color="orange-8" icon="admin_panel_settings">
+              <q-chip
+                dense
+                color="orange-1"
+                text-color="orange-8"
+                icon="admin_panel_settings"
+              >
                 {{ props.row.owners || 0 }} Dueños
               </q-chip>
             </q-card-actions>
@@ -102,157 +112,12 @@
       </template>
     </q-table>
 
-    <q-dialog v-model="detailsDialog" maximized transition-show="slide-up" transition-hide="slide-down">
-      <q-card class="bg-grey-2" v-if="selectedResidence">
-
-        <q-toolbar class="bg-primary text-white shadow-2">
-          <q-btn flat v-close-popup round dense icon="arrow_back" />
-          <q-toolbar-title>
-            Detalles de: <strong>{{ selectedResidence.name }}</strong>
-          </q-toolbar-title>
-        </q-toolbar>
-
-        <q-card-section class="q-pa-md">
-          <div class="row q-col-gutter-lg">
-
-            <div class="col-12 col-md-4">
-              <q-card flat bordered class="shadow-1 q-mb-md">
-                <q-card-section>
-                  <div class="text-h6 q-mb-md">Información General</div>
-
-                  <q-list dense>
-                    <q-item>
-                      <q-item-section avatar><q-icon color="primary" name="tag" /></q-item-section>
-                      <q-item-section><q-item-label caption>RUT</q-item-label><q-item-label>{{ selectedResidence.rut }}</q-item-label></q-item-section>
-                    </q-item>
-                    <q-item>
-                      <q-item-section avatar><q-icon color="primary" name="event" /></q-item-section>
-                      <q-item-section><q-item-label caption>Fecha Inicio</q-item-label><q-item-label>{{ formatDate(selectedResidence.dateStart) }}</q-item-label></q-item-section>
-                    </q-item>
-                    <q-item>
-                      <q-item-section avatar><q-icon color="primary" name="description" /></q-item-section>
-                      <q-item-section><q-item-label caption>Descripción</q-item-label><q-item-label>{{ selectedResidence.description }}</q-item-label></q-item-section>
-                    </q-item>
-                    <q-item>
-                      <q-item-section avatar><q-icon color="primary" name="map" /></q-item-section>
-                      <q-item-section>
-                        <q-item-label caption>Dirección</q-item-label>
-                        <q-item-label>{{ selectedResidence.address }}</q-item-label>
-                        <q-item-label caption>{{ selectedResidence.commune }}, {{ selectedResidence.city }}</q-item-label>
-                      </q-item-section>
-                    </q-item>
-                  </q-list>
-                </q-card-section>
-
-                <q-card-section class="q-pt-none" v-if="selectedResidence.mapUrl">
-                  <iframe
-                    width="100%"
-                    height="200"
-                    style="border:0; border-radius: 8px;"
-                    loading="lazy"
-                    :src="selectedResidence.mapUrl"
-                  ></iframe>
-                </q-card-section>
-              </q-card>
-            </div>
-
-            <div class="col-12 col-md-8">
-              <q-card flat bordered class="shadow-1">
-                <q-tabs
-                  v-model="activeTab"
-                  dense
-                  class="text-grey"
-                  active-color="primary"
-                  indicator-color="primary"
-                  align="justify"
-                  narrow-indicator
-                >
-                  <q-tab name="residents" icon="elderly" :label="`Residentes (${selectedResidence.listResidents?.length || 0})`" />
-                  <q-tab name="employees" icon="badge" :label="`Trabajadores (${selectedResidence.listEmployees?.length || 0})`" />
-                  <q-tab name="owners" icon="admin_panel_settings" :label="`Dueños (${selectedResidence.listOwners?.length || 0})`" />
-                </q-tabs>
-
-                <q-separator />
-
-                <q-tab-panels v-model="activeTab" animated class="bg-white">
-
-                  <q-tab-panel name="residents" class="q-pa-none">
-                    <q-list separator>
-                      <q-item v-for="person in selectedResidence.listResidents" :key="person.userId" class="q-py-md">
-                        <q-item-section avatar>
-                          <q-avatar color="blue-2" text-color="blue-8" icon="person" />
-                        </q-item-section>
-                        <q-item-section>
-                          <q-item-label class="text-weight-bold">{{ person.firstName }} {{ person.firstSurname }}</q-item-label>
-                          <q-item-label caption>RUN: {{ person.run }}</q-item-label>
-                        </q-item-section>
-                        <q-item-section side>
-                          <q-btn flat round color="primary" icon="visibility" size="sm">
-                            <q-tooltip>Ver ficha médica/detalle</q-tooltip>
-                          </q-btn>
-                        </q-item-section>
-                      </q-item>
-                      <q-item v-if="!selectedResidence.listResidents?.length">
-                        <q-item-section class="text-grey text-center q-pa-md">No hay residentes registrados.</q-item-section>
-                      </q-item>
-                    </q-list>
-                  </q-tab-panel>
-
-                  <q-tab-panel name="employees" class="q-pa-none">
-                    <q-list separator>
-                      <q-item v-for="person in selectedResidence.listEmployees" :key="person.userId" class="q-py-md">
-                        <q-item-section avatar>
-                          <q-avatar color="teal-2" text-color="teal-8" icon="badge" />
-                        </q-item-section>
-                        <q-item-section>
-                          <q-item-label class="text-weight-bold">{{ person.firstName }} {{ person.firstSurname }}</q-item-label>
-                          <q-item-label caption>RUN: {{ person.run }}</q-item-label>
-                        </q-item-section>
-                        <q-item-section side>
-                          <q-chip size="sm" :color="person.state === 'Aprobado' ? 'positive' : 'warning'" text-color="white">
-                            {{ person.state }}
-                          </q-chip>
-                        </q-item-section>
-                      </q-item>
-                      <q-item v-if="!selectedResidence.listEmployees?.length">
-                        <q-item-section class="text-grey text-center q-pa-md">No hay trabajadores registrados.</q-item-section>
-                      </q-item>
-                    </q-list>
-                  </q-tab-panel>
-
-                  <q-tab-panel name="owners" class="q-pa-none">
-                    <q-list separator>
-                      <q-item v-for="person in selectedResidence.listOwners" :key="person.userId" class="q-py-md">
-                        <q-item-section avatar>
-                          <q-avatar color="orange-2" text-color="orange-8" icon="admin_panel_settings" />
-                        </q-item-section>
-                        <q-item-section>
-                          <q-item-label class="text-weight-bold">{{ person.firstName }} {{ person.firstSurname }}</q-item-label>
-                          <q-item-label caption>RUN: {{ person.run }}</q-item-label>
-                        </q-item-section>
-                        <q-item-section side>
-                          <q-chip size="sm" :color="person.state === 'Aprobado' ? 'positive' : 'warning'" text-color="white">
-                            {{ person.state }}
-                          </q-chip>
-                        </q-item-section>
-                      </q-item>
-                      <q-item v-if="!selectedResidence.listOwners?.length">
-                        <q-item-section class="text-grey text-center q-pa-md">No hay dueños registrados.</q-item-section>
-                      </q-item>
-                    </q-list>
-                  </q-tab-panel>
-
-                </q-tab-panels>
-              </q-card>
-            </div>
-
-          </div>
-        </q-card-section>
-      </q-card>
-    </q-dialog>
-
     <pagination-controls
-      v-if="residenceStore.residences && residenceStore.residences.length > 0 && !isLoading"
+      v-if="
+        residenceStore.residences &&
+        residenceStore.residences.length > 0 &&
+        !isLoading
+      "
       :model-value="currentPage"
       @update:model-value="changePage"
       :total-page="totalPages"
@@ -267,9 +132,17 @@
     >
       <q-icon name="info" size="48px" class="q-mb-md" />
       <div class="text-h6">Sin datos disponibles</div>
-      <div class="text-subtitle2">No se encontraron residencias para mostrar</div>
+      <div class="text-subtitle2">
+        No se encontraron residencias para mostrar
+      </div>
     </div>
   </div>
+
+  <residence-details-dialog
+    v-model="detailsDialog"
+    :residence="selectedResidence"
+    @owner-created="refreshResidence"
+  />
 
   <new-residence
     title="Editar residencia"
@@ -288,12 +161,16 @@ import pinia from 'src/stores';
 import PaginationControls from 'pages/private/components/PaginationControls.vue';
 import { useResidenceStore } from 'stores/residence';
 import NewResidence from 'pages/private/ResidencesPage/components/NewResidence.vue';
-import { Company, NewCompany } from 'src/interfaces/companies/companies.interfaces';
+import {
+  Company,
+  NewCompany,
+} from 'src/interfaces/companies/companies.interfaces';
+import ResidenceDetailsDialog from 'pages/private/ResidencesPage/components/ResidenceDetailsDialog.vue';
 
 export default defineComponent({
   name: 'ResidencesComponent',
 
-  components: { NewResidence, PaginationControls },
+  components: { ResidenceDetailsDialog, NewResidence, PaginationControls },
 
   setup() {
     const residenceStore = useResidenceStore(pinia());
@@ -310,7 +187,7 @@ export default defineComponent({
       },
       set: (val) => {
         changePage(val);
-      }
+      },
     });
 
     const currentRowsPerPage = computed(() => residenceStore.limit);
@@ -337,21 +214,26 @@ export default defineComponent({
     const changeRowsPerPage = async (newLimit: number) => {
       residenceStore.$patch({
         limit: newLimit,
-        offset: 0
+        offset: 0,
       });
       await refreshData();
     };
     const filteredResidences = computed(() => residenceStore.residences ?? []);
 
     const getFullName = (row: any) => {
-      return `${row.firstName} ${row.secondName || ''} ${row.firstSurname} ${row.secondSurname || ''}`.trim().replace(/\s+/g, ' ');
+      return `${row.firstName} ${row.secondName || ''} ${row.firstSurname} ${
+        row.secondSurname || ''
+      }`
+        .trim()
+        .replace(/\s+/g, ' ');
     };
 
-    const formatDate = (dateString: any) => date.formatDate(dateString, 'DD/MM/YYYY');
+    const formatDate = (dateString: any) =>
+      date.formatDate(dateString, 'DD/MM/YYYY');
 
     const getActiveRoles = (rolesObj: any) => {
       if (!rolesObj) return [];
-      return Object.keys(rolesObj).filter(key => rolesObj[key] === true);
+      return Object.keys(rolesObj).filter((key) => rolesObj[key] === true);
     };
 
     const detailsDialog = ref(false);
@@ -361,13 +243,18 @@ export default defineComponent({
     const activeTab = ref('residents');
 
     const openResidenceDetails = async (residence: any) => {
-      await residenceStore.getResidence(residence.companyId)
+      await residenceStore.getResidence(residence.companyId);
       selectedResidence.value = residenceStore.residence;
       detailsDialog.value = true;
     };
 
+    const refreshResidence = async () => {
+      await residenceStore.getResidence(selectedResidence.value.companyId);
+      selectedResidence.value = residenceStore.residence;
+    };
+
     const openDialogEdit = async (residence: Company) => {
-      await residenceStore.getResidence(residence.companyId)
+      await residenceStore.getResidence(residence.companyId);
       selectedResidence.value = residenceStore.residence;
       dialogVisible.value = true;
     };
@@ -381,24 +268,25 @@ export default defineComponent({
           label: 'Eliminar',
           color: 'negative',
           unelevated: true,
-          icon: 'delete'
+          icon: 'delete',
         },
         cancel: {
           label: 'Cancelar',
           color: 'grey-8',
-          flat: true
+          flat: true,
         },
-        persistent: true
+        persistent: true,
       }).onOk(async () => {
         try {
-
-          const response = await residenceStore.deleteResidence(residence.companyId);
+          const response = await residenceStore.deleteResidence(
+            residence.companyId
+          );
 
           if (response) {
             $q.notify({
               type: 'positive',
               message: `La residencia ${residence.name} fue eliminada con éxito.`,
-              position: 'top-right'
+              position: 'top-right',
             });
             await residenceStore.getResidences();
           }
@@ -406,16 +294,19 @@ export default defineComponent({
           $q.notify({
             type: 'negative',
             message: 'Ocurrió un error al intentar eliminar la residencia.',
-            position: 'top-right'
+            position: 'top-right',
           });
         }
       });
     };
 
-    const handleResidenceUpdate = async (editCompany: NewCompany, closeDialog: () => void) => {
+    const handleResidenceUpdate = async (
+      editCompany: NewCompany,
+      closeDialog: () => void
+    ) => {
       const response = await residenceStore.updateResidence({
         ...editCompany,
-        city: editCompany.commune
+        city: editCompany.commune,
       });
 
       if (response) {
@@ -449,6 +340,7 @@ export default defineComponent({
       selectedResidence,
       dialogVisible,
 
+      refreshResidence,
       openResidenceDetails,
       changePage,
       changeRowsPerPage,
@@ -457,10 +349,10 @@ export default defineComponent({
       getActiveRoles,
       handleResidenceUpdate,
       openDialogEdit,
-      openDialogDelete
-    }
-  }
-})
+      openDialogDelete,
+    };
+  },
+});
 </script>
 
 <style scoped>
@@ -469,6 +361,6 @@ export default defineComponent({
 }
 .residence-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
 }
 </style>

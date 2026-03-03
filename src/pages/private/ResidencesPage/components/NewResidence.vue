@@ -216,27 +216,8 @@ export default defineComponent({
   mixins: [globalMixin],
 
   setup(props, { emit }) {
-
     const optionStore = useOptionStore(pinia());
     const { formatRut, validateRut } = useRut();
-
-    const communeOptions = computed(() => {
-      if (!residence.value.region) return [];
-
-      const selectedRegionObj = optionStore.regions?.regions.find(r => r.name === residence.value.region);
-
-      return selectedRegionObj ? selectedRegionObj.communes : [];
-    });
-
-    const onRegionChange = () => {
-      residence.value.commune = '';
-      residence.value.city = '';
-    };
-
-    const internalDialogVisible = computed({
-      get: () => props.dialogVisible,
-      set: (val: boolean) => emit('update:dialogVisible', val)
-    });
 
     const residence = ref<NewCompany>({
       name: '',
@@ -251,6 +232,27 @@ export default defineComponent({
       details: '{\"state\": \"Approved\"}'
     });
 
+    const communeOptions = computed(() => {
+      const currentRegionName = residence.value.region;
+      const allRegions = optionStore.regions?.regions || [];
+
+      if (!currentRegionName || allRegions.length === 0) return [];
+
+
+      const selectedRegionObj = allRegions.find(r => r.name === currentRegionName);
+      return selectedRegionObj ? selectedRegionObj.communes : [];
+    });
+
+    const onRegionChange = () => {
+      residence.value.commune = '';
+      residence.value.city = '';
+    };
+
+    const internalDialogVisible = computed({
+      get: () => props.dialogVisible,
+      set: (val: boolean) => emit('update:dialogVisible', val)
+    });
+
     watch(
       [() => residence.value.address, () => residence.value.commune, () => residence.value.region],
       ([newAddress, newCommune, newRegion]) => {
@@ -258,22 +260,25 @@ export default defineComponent({
           const fullAddress = `${newAddress}, ${newCommune}, ${newRegion ? newRegion + ',' : ''} Chile`;
           const encodedAddress = encodeURIComponent(fullAddress);
           residence.value.mapUrl = `https://maps.google.com/maps?q=${encodedAddress}&output=embed`;
-
         } else {
           residence.value.mapUrl = '';
         }
       }
     );
 
-    watch(() => props.residenceEdit, (val) => {
-      if (props.isEdit && val) {
-        residence.value = { ...val };
+    watch(() => props.dialogVisible, (isVisible) => {
+      if (isVisible) {
+        if (props.isEdit && props.residenceEdit) {
+          Object.assign(residence.value, props.residenceEdit);
+        } else {
+          resetForm();
+        }
       }
-    }, { immediate: true });
+    });
 
     const closeDialog = () => {
       emit('update:dialogVisible', false);
-      resetForm();
+      setTimeout(() => resetForm(), 300);
     };
 
     const resetForm = () => {
@@ -287,7 +292,7 @@ export default defineComponent({
         description: '',
         mapUrl: '',
         dateStart: '',
-        details: ''
+        details: '{\"state\": \"Approved\"}'
       };
     };
 
