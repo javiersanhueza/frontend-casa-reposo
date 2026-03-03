@@ -47,7 +47,9 @@ const routes: RouteRecordRaw[] = [
         path: 'residents',
         component: () => import('pages/private/ResidentPage/ResidentPage.vue'),
         name: 'ResidentPage',
-        meta: { isProtectedRoute: true }
+        meta: {
+          isProtectedRoute: true,
+          allowedRoles: ['admin'] }
       },
       {
         path: 'new-resident',

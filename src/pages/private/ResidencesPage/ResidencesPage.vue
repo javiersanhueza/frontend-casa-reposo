@@ -23,7 +23,7 @@
   <new-residence
     title="Nueva residencia"
     v-model:dialogVisible="dialogVisible"
-    @submitted="handleUserCreate"
+    @submitted="handleResidenceCreate"
   />
 </template>
 
@@ -40,7 +40,7 @@ import ResidencesComponent from 'pages/private/ResidencesPage/components/Residen
 import NewResidence from 'pages/private/ResidencesPage/components/NewResidence.vue';
 
 export default defineComponent({
-  name: 'UsersPage',
+  name: 'ResidencesPage',
 
   components: { NewResidence, ResidencesComponent },
 
@@ -49,7 +49,7 @@ export default defineComponent({
     const residenceStore = useResidenceStore(pinia());
     const optionStore = useOptionStore(pinia());
 
-    const handleUserCreate = async (newCompany: NewCompany, closeDialog: () => void) => {
+    const handleResidenceCreate = async (newCompany: NewCompany, closeDialog: () => void) => {
       const response = await residenceStore.createResidence({
         ...newCompany,
         city: newCompany.commune,
@@ -77,7 +77,7 @@ export default defineComponent({
     return {
       dialogVisible,
 
-      handleUserCreate,
+      handleResidenceCreate,
     };
   },
 });

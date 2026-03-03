@@ -15,7 +15,7 @@ export interface Company {
 }
 
 export interface NewCompany {
-  id?: number;
+  companyId?: number;
   name: string;
   rut: string;
   region: string;

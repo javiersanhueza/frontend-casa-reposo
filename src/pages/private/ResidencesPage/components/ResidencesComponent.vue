@@ -88,13 +88,13 @@
 
             <q-card-actions class="q-px-md q-py-sm justify-between bg-grey-1">
               <q-chip dense color="blue-1" text-color="blue-8" icon="elderly">
-                {{ props.row.listResidents?.length || 0 }} Residentes
+                {{ props.row.residents || 0 }} Residentes
               </q-chip>
               <q-chip dense color="teal-1" text-color="teal-8" icon="badge">
-                {{ props.row.listEmployees?.length || 0 }} Empleados
+                {{ props.row.employees || 0 }} Empleados
               </q-chip>
               <q-chip dense color="orange-1" text-color="orange-8" icon="admin_panel_settings">
-                {{ props.row.listOwners?.length || 0 }} Dueños
+                {{ props.row.owners || 0 }} Dueños
               </q-chip>
             </q-card-actions>
           </q-card>
@@ -270,33 +270,42 @@
       <div class="text-subtitle2">No se encontraron residencias para mostrar</div>
     </div>
   </div>
+
+  <new-residence
+    title="Editar residencia"
+    v-model:dialogVisible="dialogVisible"
+    is-edit
+    :residence-edit="selectedResidence"
+    @submitted="handleResidenceUpdate"
+  />
 </template>
 
 <script lang="ts">
 import { computed, defineComponent, onMounted, ref } from 'vue';
-import { date, useQuasar } from 'quasar';
+import { date, Notify, useQuasar } from 'quasar';
 
-import { useUserStore } from 'stores/user';
 import pinia from 'src/stores';
 import PaginationControls from 'pages/private/components/PaginationControls.vue';
 import { useResidenceStore } from 'stores/residence';
+import NewResidence from 'pages/private/ResidencesPage/components/NewResidence.vue';
+import { Company, NewCompany } from 'src/interfaces/companies/companies.interfaces';
 
 export default defineComponent({
   name: 'ResidencesComponent',
 
-  components: { PaginationControls },
+  components: { NewResidence, PaginationControls },
 
   setup() {
-    const userStore = useUserStore(pinia());
     const residenceStore = useResidenceStore(pinia());
     const filter = ref('');
     const isLoading = ref(false);
     const $q = useQuasar();
+    const dialogVisible = ref(false);
 
     const currentPage = computed({
       get: () => {
-        const offset = userStore.offset || 0;
-        const limit = userStore.limit || 10;
+        const offset = residenceStore.offset || 0;
+        const limit = residenceStore.limit || 10;
         return Math.floor(offset / limit) + 1;
       },
       set: (val) => {
@@ -304,14 +313,14 @@ export default defineComponent({
       }
     });
 
-    const currentRowsPerPage = computed(() => userStore.limit);
+    const currentRowsPerPage = computed(() => residenceStore.limit);
 
-    const totalPages = computed(() => userStore.totalPage || 0);
+    const totalPages = computed(() => residenceStore.totalPage || 0);
 
     const refreshData = async () => {
       try {
         isLoading.value = true;
-        await residenceStore.getResidences();
+        await residenceStore.getResidencesPagination();
       } catch (e) {
         console.error(e);
       } finally {
@@ -320,13 +329,13 @@ export default defineComponent({
     };
 
     const changePage = async (newPage: number) => {
-      const newOffset = (newPage - 1) * userStore.limit;
-      userStore.$patch({ offset: newOffset });
+      const newOffset = (newPage - 1) * residenceStore.limit;
+      residenceStore.$patch({ offset: newOffset });
       await refreshData();
     };
 
     const changeRowsPerPage = async (newLimit: number) => {
-      userStore.$patch({
+      residenceStore.$patch({
         limit: newLimit,
         offset: 0
       });
@@ -351,13 +360,16 @@ export default defineComponent({
 
     const activeTab = ref('residents');
 
-    const openResidenceDetails = (residence: any) => {
-      selectedResidence.value = residence;
+    const openResidenceDetails = async (residence: any) => {
+      await residenceStore.getResidence(residence.companyId)
+      selectedResidence.value = residenceStore.residence;
       detailsDialog.value = true;
     };
 
-    const openDialogEdit = (residence: any) => {
-      console.log(residence);
+    const openDialogEdit = async (residence: Company) => {
+      await residenceStore.getResidence(residence.companyId)
+      selectedResidence.value = residenceStore.residence;
+      dialogVisible.value = true;
     };
 
     const openDialogDelete = (residence: any) => {
@@ -400,12 +412,31 @@ export default defineComponent({
       });
     };
 
+    const handleResidenceUpdate = async (editCompany: NewCompany, closeDialog: () => void) => {
+      const response = await residenceStore.updateResidence({
+        ...editCompany,
+        city: editCompany.commune
+      });
+
+      if (response) {
+        closeDialog();
+
+        Notify.create({
+          type: 'positive',
+          message: 'Residencia editada con éxito',
+          position: 'top-right',
+          timeout: 3000,
+        });
+
+        await residenceStore.getResidences();
+      }
+    };
+
     onMounted(() => {
       refreshData();
     });
 
     return {
-      userStore,
       filter,
       filteredResidences,
       isLoading,
@@ -416,6 +447,7 @@ export default defineComponent({
       activeTab,
       detailsDialog,
       selectedResidence,
+      dialogVisible,
 
       openResidenceDetails,
       changePage,
@@ -423,7 +455,7 @@ export default defineComponent({
       getFullName,
       formatDate,
       getActiveRoles,
-
+      handleResidenceUpdate,
       openDialogEdit,
       openDialogDelete
     }

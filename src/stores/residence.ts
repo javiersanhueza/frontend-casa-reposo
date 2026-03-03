@@ -6,6 +6,7 @@ import { Company, NewCompany } from 'src/interfaces/companies/companies.interfac
 
 interface ResidenceState {
   residences: Company[] | null;
+  residence: Company | null;
   limit: number;
   offset: number;
   order: string;
@@ -16,19 +17,20 @@ interface ResidenceState {
 export const useResidenceStore = defineStore('residence', {
   state: (): ResidenceState => ({
     residences: [],
+    residence: null,
     limit: 10,
     offset: 0,
     order: 'ASC',
-    orderBy: 'run',
+    orderBy: 'rut',
     totalPage: null
   }),
 
   actions: {
-    /* async getUsersPagination() {
+    async getResidencesPagination() {
       try {
-        this.users = [];
-        const response: AxiosResponse<{ data: { count: number, rows: User[] }, statusCode: number, send: string }> = await apiClient.post(
-          '/users/pagination',
+        this.residences = [];
+        const response: AxiosResponse<{ data: { count: number, rows: Company[] }, statusCode: number, send: string }> = await apiClient.post(
+          '/companies/pagination',
           {
             limit: this.limit,
             offset: this.offset,
@@ -38,12 +40,12 @@ export const useResidenceStore = defineStore('residence', {
         );
 
         const count = response.data.data.count;
-        this.users = response.data.data.rows;
+        this.residences = response.data.data.rows;
         this.totalPage = count / this.limit < 1 ? 1 : Math.ceil(count / this.limit);
       } catch (error) {
         console.log('Error en getUsersPagination', error);
       }
-    }, */
+    },
 
     async getResidences() {
       try {
@@ -57,11 +59,39 @@ export const useResidenceStore = defineStore('residence', {
       }
     },
 
+    async getResidence(companyId: number) {
+      try {
+        const response: AxiosResponse<{ data: Company, statusCode: number, send: string }> = await apiClient.get(
+          `/companies/${companyId}`,
+        );
+
+        this.residence = response.data.data;
+      } catch (error) {
+        console.log('Error en getResidence', error);
+      }
+    },
+
     async createResidence(newCompany: NewCompany) {
       try {
         const response: AxiosResponse = await apiClient.post<{ data: { data: number; send: string; statusCode: number } }>(
           '/companies',
           newCompany
+        );
+
+        if (response.data.statusCode === 201) {
+          return response.data;
+        }
+        return response;
+      } catch (error) {
+        console.log('Error en createResidence', error);
+      }
+    },
+
+    async updateResidence(companyEdit: NewCompany) {
+      try {
+        const response: AxiosResponse = await apiClient.put<{ data: { data: number; send: string; statusCode: number } }>(
+          `/companies/${companyEdit.companyId}`,
+          companyEdit
         );
 
         if (response.data.statusCode === 201) {
@@ -85,19 +115,5 @@ export const useResidenceStore = defineStore('residence', {
 
       }
     }
-
-    /* async createAdminUser(newUser: CreateUserPayload) {
-      try {
-        const response: AxiosResponse = await apiClient.post(
-          '/users/admin',
-          newUser
-        );
-
-        console.log(response);
-        return response;
-      } catch (error) {
-        console.log('Error en createAdminUser', error);
-      }
-    } */
   }
 })

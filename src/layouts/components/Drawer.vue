@@ -89,7 +89,7 @@ export default defineComponent({
 
     const rawMenuResults: Menu[] = [
       { id: 1, to: 'Home', icon: 'home', label: 'Home' },
-      { id: 2, to: 'ResidentPage', icon: 'elderly', label: 'Residentes' },
+      { id: 2, to: 'ResidentPage', icon: 'elderly', label: 'Residentes', roles: ['admin'] },
     ];
 
     const rawMenuConfigCompany: Menu[] = [
@@ -112,12 +112,12 @@ export default defineComponent({
         label: 'Usuarios',
         roles: ['superUser', 'admin']
       },
-      {
+      /*{
         id: 7,
         to: 'OptionMaintainer',
         icon: 'tune',
         label: 'Mantenedor de opciones'
-      }
+      }*/
     ];
 
     const menuResults = computed(() => rawMenuResults.filter(item => hasRole(item.roles)));
