@@ -7,11 +7,21 @@ import { globalMixin } from 'src/mixins/globalMixin';
 
 interface EmployeeState {
   employees: Employee[] | null;
+  limit: number;
+  offset: number;
+  order: string;
+  orderBy: string;
+  totalPage: number | null
 }
 
 export const useEmployeeStore = defineStore('employee', {
   state: (): EmployeeState => ({
-    employees: null
+    employees: null,
+    limit: 10,
+    offset: 0,
+    order: 'ASC',
+    orderBy: 'rut',
+    totalPage: null
   }),
 
   getters: {
@@ -19,32 +29,24 @@ export const useEmployeeStore = defineStore('employee', {
   },
 
   actions: {
-    async getEmployees(page: number = 1, limit: number = 10, rut?: string, name?: string) {
+    async getEmployeesPagination() {
       try {
-        const companyId = globalMixin.methods.getIdCompany();
-        const params: any = {
-          companyId,
-          page,
-          limit
-        };
-
-        if (rut) {
-          params.rut = rut;
-        }
-
-        if (name) {
-          params.name = name;
-        }
-
-        console.log(params);
-        const response: AxiosResponse = await apiClient.get(
-          `/${process.env.CONTEXT_API_PRIVATE}/employees`,
-          { params }
+        this.employees = [];
+        const response: AxiosResponse<{ data: { count: number, rows: any[] }, statusCode: number, send: string }> = await apiClient.post(
+          '/employees/pagination',
+          {
+            limit: this.limit,
+            offset: this.offset,
+            order: this.order,
+            orderBy: this.orderBy
+          }
         );
 
-        this.employees = response.data.employees;
+        const count = response.data.data.count;
+        this.employees = response.data.data.rows;
+        this.totalPage = count / this.limit < 1 ? 1 : Math.ceil(count / this.limit);
       } catch (error) {
-        console.log('Error en getEmployees', error);
+        console.log('Error en getEmployeesPagination', error);
       }
     },
 

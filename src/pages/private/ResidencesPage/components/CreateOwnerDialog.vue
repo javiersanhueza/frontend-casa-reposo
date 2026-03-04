@@ -7,7 +7,7 @@
           <q-icon name="admin_panel_settings" size="md" />
         </q-avatar>
         <q-toolbar-title class="text-weight-bold text-subtitle1">
-          Asignar Nuevo Dueño
+          {{ title }}
         </q-toolbar-title>
         <q-btn flat round dense icon="close" v-close-popup @click="closeDialog">
           <q-tooltip>Cerrar</q-tooltip>
@@ -74,6 +74,7 @@
                 v-model="owner.run"
                 label="RUN *"
                 maxlength="12"
+                :disable="isEditing"
                 @update:model-value="onRutInput"
                 lazy-rules
                 :rules="[
@@ -216,10 +217,10 @@
               <q-input
                 outlined
                 v-model="owner.password"
-                label="Contraseña Temporal *"
+                :label="isEditing ? 'Nueva Contraseña (Opcional)' : 'Contraseña Temporal *'"
                 :type="showPassword ? 'text' : 'password'"
                 lazy-rules
-                :rules="[(val: string) => !!val || 'Campo requerido']"
+                :rules="isEditing ? [] : [(val: string) => !!val || 'Campo requerido']"
               >
                 <template v-slot:prepend><q-icon name="lock" color="grey-6" /></template>
                 <template v-slot:append>
@@ -232,20 +233,18 @@
               </q-input>
             </div>
 
-            <!--
             <div class="col-12 col-md-6">
               <q-select
                 outlined
                 v-model="owner.ownerRole"
-                :options="['Administrador Hogar', 'Representante Legal', 'Socio']"
-                label="Rol del Dueño *"
+                :options="['Administrador Residencia', 'Dueño Residencia']"
+                label="Rol *"
                 lazy-rules
                 :rules="[(val: string) => !!val || 'Campo requerido']"
               >
                 <template v-slot:prepend><q-icon name="manage_accounts" color="grey-6" /></template>
               </q-select>
             </div>
-          -->
           </div>
         </q-card-section>
 
@@ -253,7 +252,7 @@
 
         <q-card-actions align="right" class="bg-grey-1 q-px-lg q-py-md">
           <q-btn flat label="Cancelar" color="grey-8" class="q-px-md" @click="closeDialog" />
-          <q-btn unelevated label="Guardar Dueño" color="primary" icon="save" type="submit" class="q-px-md q-ml-sm" />
+          <q-btn unelevated label="Guardar" color="primary" icon="save" type="submit" class="q-px-md q-ml-sm" />
         </q-card-actions>
       </q-form>
     </q-card>
@@ -271,6 +270,8 @@ export default defineComponent({
 
   props: {
     dialogVisible: { type: Boolean, required: true },
+    title: { type: String, required: true },
+    ownerEdit: { type: Object, default: () => ({}) }
   },
 
   emits: ['update:dialogVisible', 'submitted'],
@@ -280,6 +281,8 @@ export default defineComponent({
     const { formatRut, validateRut } = useRut();
 
     const showPassword = ref(false);
+
+    const isEditing = computed(() => Object.keys(props.ownerEdit || {}).length > 0);
 
     const owner = ref({
       firstName: '',
@@ -296,7 +299,7 @@ export default defineComponent({
       address: '',
       email: '',
       password: '',
-      ownerRole: 'Administrador Hogar'
+      ownerRole: ''
     });
 
     const communeOptions = computed(() => {
@@ -308,7 +311,8 @@ export default defineComponent({
     });
 
     watch(() => owner.value.region, (newRegion, oldRegion) => {
-      if (oldRegion && newRegion !== oldRegion) {
+      // Solo limpiamos la comuna si no estamos cargando datos de edición inicialmente
+      if (oldRegion && newRegion !== oldRegion && !isLoadingEditData.value) {
         owner.value.commune = '';
       }
     });
@@ -318,11 +322,62 @@ export default defineComponent({
       set: (val: boolean) => emit('update:dialogVisible', val)
     });
 
+    // Bandera auxiliar para no borrar la comuna al poblar el form
+    const isLoadingEditData = ref(false);
+
     watch(() => props.dialogVisible, (isVisible) => {
       if (isVisible) {
-        resetForm();
+        if (isEditing.value) {
+          populateForm();
+        } else {
+          resetForm();
+        }
       }
     });
+
+    const populateForm = () => {
+      isLoadingEditData.value = true;
+      const data = props.ownerEdit;
+
+      // Extraer teléfono del JSON String si existe
+      let extractedPhone = '';
+      if (data.phones) {
+        try {
+          const parsed = JSON.parse(data.phones);
+          extractedPhone = parsed.list?.[0] || '';
+        } catch (e) {
+          extractedPhone = data.phones; // Fallback por si acaso no es JSON
+        }
+      }
+
+      // Convertir fecha de ISO a YYYY-MM-DD
+      let extractedDate = '';
+      if (data.dateBirth) {
+        // Asumiendo formato "1963-05-29T12:00:00.000Z" -> "1963-05-29"
+        extractedDate = data.dateBirth.split('T')[0];
+      }
+
+      owner.value = {
+        firstName: data.firstName || '',
+        secondName: data.secondName || '',
+        firstSurname: data.firstSurname || '',
+        secondSurname: data.secondSurname || '',
+        run: formatRut(data.run) || '',
+        gender: data.gender || 'Masculino',
+        dateBirth: extractedDate,
+        nationality: data.nationality || 'Chilena',
+        phone: extractedPhone,
+        region: data.region || '',
+        commune: data.commune || '',
+        address: data.address || '',
+        email: data.email || '',
+        password: '', // En edición no mostramos el password actual
+        ownerRole: data.subRole || data.ownerRole || '' // Ajustar según venga en tu backend
+      };
+
+      // Damos tiempo a que Vue actualice los v-model antes de bajar la bandera
+      setTimeout(() => { isLoadingEditData.value = false; }, 100);
+    };
 
     const closeDialog = () => {
       emit('update:dialogVisible', false);
@@ -334,15 +389,21 @@ export default defineComponent({
         firstName: '', secondName: '', firstSurname: '', secondSurname: '',
         run: '', gender: 'Masculino', dateBirth: '', nationality: 'Chilena',
         phone: '', region: '', commune: '', address: '',
-        email: '', password: '', ownerRole: 'Administrador Hogar'
+        email: '', password: '', ownerRole: ''
       };
       showPassword.value = false;
     };
 
     const onSubmit = () => {
-      const isoDate = owner.value.dateBirth ? new Date(owner.value.dateBirth).toISOString() : '';
+      let isoDate = '';
+      if (owner.value.dateBirth) {
+        // Verificamos si ya está en formato ISO, si no, lo convertimos
+        isoDate = owner.value.dateBirth.includes('T')
+          ? owner.value.dateBirth
+          : new Date(`${owner.value.dateBirth}T12:00:00`).toISOString();
+      }
 
-      const payloadToSubmit = {
+      const payloadToSubmit: any = {
         email: owner.value.email,
         gender: owner.value.gender,
         nationality: owner.value.nationality,
@@ -358,9 +419,18 @@ export default defineComponent({
         phones: JSON.stringify({ list: [owner.value.phone] }),
         run: owner.value.run,
         ownerRole: owner.value.ownerRole,
-        password: owner.value.password,
         details: JSON.stringify({ state: 'Approved' })
       };
+
+      // Si es creación enviamos contraseña, si es edición y llenó el campo, también
+      if (!isEditing.value || (isEditing.value && owner.value.password)) {
+        payloadToSubmit.password = owner.value.password;
+      }
+
+      // Si estamos editando, agregamos el userId para que el backend sepa a quién actualizar
+      if (isEditing.value && props.ownerEdit.userId) {
+        payloadToSubmit.userId = props.ownerEdit.userId;
+      }
 
       emit('submitted', payloadToSubmit);
     };
@@ -378,6 +448,7 @@ export default defineComponent({
       showPassword,
       communeOptions,
       optionStore,
+      isEditing, // Exportamos la bandera para usarla en el Template
       onRutInput,
       isValidRut,
       closeDialog,

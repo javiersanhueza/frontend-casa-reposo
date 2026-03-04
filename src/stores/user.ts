@@ -98,6 +98,61 @@ export const useUserStore = defineStore('user', {
       } catch (error) {
         console.log('Error en createOwner', error);
       }
-    }
+    },
+
+    async deleteOwner(id: number) {
+      try {
+        const response: AxiosResponse = await apiClient.delete<{ data: { data: number; send: string; statusCode: number } }>(
+          `/owners/${id}`
+        );
+
+        return response.data;
+      } catch (error) {
+        console.log('Error en deleteOwner', error);
+      }
+    },
+
+    async deleteOwnerCompany(id: number) {
+      try {
+        const response: AxiosResponse = await apiClient.delete<{ data: { data: number; send: string; statusCode: number } }>(
+          `/company-owners/${id}`
+        );
+
+        return response.data;
+      } catch (error) {
+        console.log('Error en deleteOwnerCompany', error);
+      }
+    },
+
+    async editOwner(owner: any, id: number) {
+      try {
+        const response: AxiosResponse = await apiClient.put<{ data: { data: number; send: string; statusCode: number }}>(
+          `/owners/update/data/${id}`,
+          owner
+        );
+
+        if (response.data.statusCode === 201) {
+          return response.data;
+        }
+
+      } catch (error) {
+        console.log('Error en createOwner', error);
+      }
+    },
+
+    async getOwner(id: number) {
+      try {
+        const response: AxiosResponse<{ data: any, statusCode: number, send: string }> = await apiClient.get(
+          `/owners/${id}`
+        );
+
+        return {
+          ...response.data.data,
+          phones: response.data.data.phones[0]
+        };
+      } catch (error) {
+        console.log('Error en getUsers', error);
+      }
+    },
   }
 })

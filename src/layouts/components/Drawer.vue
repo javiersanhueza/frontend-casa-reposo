@@ -84,12 +84,26 @@ export default defineComponent({
 
     const hasRole = (allowedRoles?: string[]) => {
       if (!allowedRoles || allowedRoles.length === 0) return true;
-      return allowedRoles.some(role => userRoles[role] === true);
+
+      return allowedRoles.some(roleStr => {
+        if (roleStr.includes(':')) {
+          const [roleKey, roleValue] = roleStr.split(':');
+          return userRoles[roleKey] === roleValue;
+        }
+        return userRoles[roleStr] === true;
+      });
     };
 
     const rawMenuResults: Menu[] = [
       { id: 1, to: 'Home', icon: 'home', label: 'Home' },
       { id: 2, to: 'ResidentPage', icon: 'elderly', label: 'Residentes', roles: ['admin'] },
+      {
+        id: 8,
+        to: 'Employee',
+        icon: 'badge',
+        label: 'Trabajadores',
+        roles: ['owner:Administrador Residencia', 'owner:Dueño Residencia']
+      }
     ];
 
     const rawMenuConfigCompany: Menu[] = [

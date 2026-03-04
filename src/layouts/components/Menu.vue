@@ -24,9 +24,18 @@
             <q-item-label class="text-weight-bold text-subtitle2 text-grey-9">
               {{ user?.firstName }} {{ user?.firstSurname }}
             </q-item-label>
-            <q-item-label caption class="text-grey-6 ellipsis">
+            <q-item-label caption class="text-grey-6 ellipsis q-mb-xs">
               {{ user?.email }}
             </q-item-label>
+
+            <div>
+              <q-badge
+                :color="userRoleInfo.color"
+                :label="userRoleInfo.label"
+                class="text-weight-bold q-py-xs q-px-sm"
+                style="border-radius: 4px;"
+              />
+            </div>
           </q-item-section>
         </q-item>
 
@@ -79,13 +88,11 @@ export default defineComponent({
 
   setup() {
     const router = useRouter();
-    // Uso opcional chaining (?) por seguridad al parsear el localstorage
     const userStr = localStorage.getItem('user');
     const user = userStr ? JSON.parse(userStr) : null;
 
     const menu = ref(false);
 
-    // Creamos las iniciales (Ej: "Juan Perez" -> "JP")
     const userInitials = computed(() => {
       if (!user) return 'U';
       const first = user.firstName ? user.firstName.charAt(0).toUpperCase() : '';
@@ -98,6 +105,21 @@ export default defineComponent({
       router.push({ name: 'Login' });
     };
 
+    const userRoleInfo = computed(() => {
+      const roles = user?.roles;
+      if (!roles) return { label: 'Sin Rol', color: 'grey-7' };
+
+      if (roles.superUser) return { label: 'Súper Usuario', color: 'purple-7' };
+      if (roles.admin) return { label: 'Administrador', color: 'primary' };
+
+      if (roles.owner) return { label: roles.owner, color: 'orange-8' };
+
+      if (roles.employee) return { label: 'Empleado', color: 'teal-7' };
+      if (roles.proxy) return { label: 'Apoderado', color: 'accent' };
+
+      return { label: 'Usuario', color: 'grey-7' };
+    });
+
     const menuConfigUser = ref<Menu[]>([
       {
         id: 1,
@@ -106,9 +128,9 @@ export default defineComponent({
         label: 'Cambiar de residencia',
       },
       {
-        id: 2, // Corregido: ID único
+        id: 2,
         to: 'EditUser',
-        icon: 'manage_accounts', // Cambié el ícono 'edit' por algo más de perfil
+        icon: 'manage_accounts',
         label: 'Editar mis datos',
       },
     ]);
@@ -118,6 +140,8 @@ export default defineComponent({
       userInitials,
       menu,
       menuConfigUser,
+      userRoleInfo,
+
       logOut
     };
   }

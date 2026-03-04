@@ -21,7 +21,7 @@
               <q-card-section>
                 <div class="text-h6 q-mb-md">Información General</div>
 
-                <q-list dense>
+                <q-list separator>
                   <q-item>
                     <q-item-section avatar
                       ><q-icon color="primary" name="tag"
@@ -208,54 +208,100 @@
                 <q-tab-panel name="owners" class="q-pa-none">
                   <div class="q-pa-md row justify-end">
                     <q-btn
-                      color="orange-8"
-                      icon="add_circle"
+                      flat
+                      color="orange-9"
+                      icon="person_add"
                       label="Asignar Nuevo Dueño"
-                      unelevated
+                      class="bg-orange-1 q-px-md q-py-sm text-weight-bold transition-ease"
+                      style="border-radius: 8px;"
                       @click="openCreateOwnerModal"
                     />
                   </div>
 
                   <q-separator />
 
-                  <q-list separator>
+                  <q-list separator class="rounded-borders">
                     <q-item
                       v-for="person in residence.listOwners"
                       :key="person.userId"
-                      class="q-py-md"
+                      class="q-py-md company-item transition-ease"
                     >
                       <q-item-section avatar>
                         <q-avatar
-                          color="orange-2"
+                          color="orange-1"
                           text-color="orange-8"
                           icon="admin_panel_settings"
                         />
                       </q-item-section>
+
                       <q-item-section>
-                        <q-item-label class="text-weight-bold"
-                          >{{ person.firstName }}
-                          {{ person.firstSurname }}</q-item-label
-                        >
-                        <q-item-label caption
-                          >RUN: {{ person.run }}</q-item-label
-                        >
+                        <q-item-label class="text-weight-bold text-grey-9 row items-center q-gutter-x-sm">
+                          <span class="text-body2 text-weight-bold">{{ person.firstName }} {{ person.firstSurname }}</span>
+
+                          <q-badge
+                            v-if="person.subRole"
+                            color="orange-1"
+                            text-color="orange-9"
+                            :label="person.subRole"
+                            class="text-weight-bold q-px-sm q-py-xs"
+                            style="border-radius: 6px; font-size: 0.65rem;"
+                          />
+                        </q-item-label>
+
+                        <q-item-label caption class="text-grey-6 q-mt-xs">
+                          <q-icon name="fingerprint" size="xs" class="q-mr-xs" />
+                          RUN: {{ person.run }}
+                        </q-item-label>
                       </q-item-section>
+
                       <q-item-section side>
-                        <q-chip
-                          size="sm"
-                          :color="
-                            person.state === 'Aprobado' ? 'positive' : 'warning'
-                          "
-                          text-color="white"
-                        >
-                          {{ person.state }}
-                        </q-chip>
+                        <div class="row items-center no-wrap">
+
+                          <q-chip
+                            size="sm"
+                            :color="person.state === 'Aprobado' ? 'positive' : 'warning'"
+                            text-color="white"
+                            class="q-ma-none text-weight-bold"
+                          >
+                            {{ person.state }}
+                          </q-chip>
+
+                          <q-separator vertical inset class="q-mx-md" />
+
+                          <div class="row q-gutter-xs">
+                            <q-btn
+                              flat
+                              round
+                              dense
+                              color="primary"
+                              icon="edit"
+                              size="sm"
+                              @click.stop="editOwner(person)"
+                            >
+                              <q-tooltip class="bg-primary shadow-4">Editar dueño</q-tooltip>
+                            </q-btn>
+
+                            <q-btn
+                              flat
+                              round
+                              dense
+                              color="negative"
+                              icon="delete_outline"
+                              size="sm"
+                              @click.stop="deleteOwner(person)"
+                            >
+                              <q-tooltip class="bg-negative shadow-4">Eliminar dueño</q-tooltip>
+                            </q-btn>
+                          </div>
+
+                        </div>
                       </q-item-section>
                     </q-item>
 
                     <q-item v-if="!residence.listOwners?.length">
-                      <q-item-section class="text-grey text-center q-pa-md">
-                        No hay dueños registrados.
+                      <q-item-section class="text-grey-6 text-center items-center q-pa-lg">
+                        <q-icon name="sentiment_dissatisfied" size="40px" class="q-mb-sm opacity-50" />
+                        <div class="text-body1 text-weight-medium">No hay dueños registrados.</div>
                       </q-item-section>
                     </q-item>
                   </q-list>
@@ -270,6 +316,8 @@
 
   <create-owner-dialog
     v-model:dialogVisible="createOwnerModalVisible"
+    :title="isEditOwner ? 'Editar Dueño' : 'Asignar Nuevo Dueño'"
+    :owner-edit="ownerSelected"
     @submitted="handleOwnerSubmit"
   />
 </template>
@@ -280,10 +328,11 @@ import CreateOwnerDialog from 'pages/private/ResidencesPage/components/CreateOwn
 import { useUserStore } from 'stores/user';
 import pinia from 'src/stores';
 import { useResidenceStore } from 'stores/residence';
-import { Notify } from 'quasar';
+import { Notify, useQuasar } from 'quasar';
 
 export default defineComponent({
   name: 'ResidenceDetailsDialog',
+
   components: { CreateOwnerDialog },
 
   props: {
@@ -304,9 +353,13 @@ export default defineComponent({
     const createOwnerModalVisible = ref(false);
     const userStore = useUserStore(pinia());
     const residenceStore = useResidenceStore(pinia());
+    const $q = useQuasar();
+    const isEditOwner = ref(false);
 
     const openCreateOwnerModal = () => {
+      ownerSelected.value = null;
       createOwnerModalVisible.value = true;
+      isEditOwner.value = false;
     };
 
     const formatDate = (dateString: string) => {
@@ -319,20 +372,81 @@ export default defineComponent({
       return new Date(dateString).toLocaleDateString('es-CL', options);
     };
 
-    const handleOwnerSubmit = async (ownerPayload: any) => {
-      const response = await userStore.createOwner(ownerPayload);
-      await residenceStore.companyOwner({
-        companyId: props.residence.companyId,
-        ownerId: response.data,
-        state: 'Aprobado'
-      });
+    const deleteOwner = async (owner: any) => {
+      $q.dialog({
+        title: 'Confirmar Eliminación',
+        message: `¿Estás seguro de que deseas eliminar a <strong>${owner.firstName} ${owner.firstSurname}</strong>?<br><br><span class="text-caption text-grey-8">Esta acción no se puede deshacer.</span>`,
+        html: true,
+        ok: {
+          label: 'Eliminar',
+          color: 'negative',
+          unelevated: true,
+          icon: 'delete',
+        },
+        cancel: {
+          label: 'Cancelar',
+          color: 'grey-8',
+          flat: true,
+        },
+        persistent: true,
+      }).onOk(async () => {
+        try {
+          const response = await userStore.deleteOwner(
+            owner.userId
+          );
 
-      Notify.create({
-        type: 'positive',
-        message: 'Dueño asignado con éxito',
-        position: 'top-right',
-        timeout: 3000,
+          if (response) {
+            await userStore.deleteOwnerCompany(owner.companyOwnerId);
+            $q.notify({
+              type: 'positive',
+              message: ` ${owner.firstName} ${owner.firstSurname} fue eliminado con éxito.`,
+              position: 'top-right',
+            });
+            emit('owner-created');
+          }
+        } catch (error) {
+          $q.notify({
+            type: 'negative',
+            message: 'Ocurrió un error al intentar eliminar la residencia.',
+            position: 'top-right',
+          });
+        }
       });
+    };
+
+    const ownerSelected = ref();
+    const editOwner = async (owner: any) => {
+      const response = await userStore.getOwner(owner.userId);
+      isEditOwner.value = true;
+      ownerSelected.value = response;
+      createOwnerModalVisible.value = true;
+    };
+
+    const handleOwnerSubmit = async (ownerPayload: any) => {
+      if (isEditOwner.value) {
+        await userStore.editOwner(ownerPayload, ownerSelected.value.userId);
+
+        Notify.create({
+          type: 'positive',
+          message: 'Dueño editado con éxito',
+          position: 'top-right',
+          timeout: 3000,
+        });
+      } else {
+        const response = await userStore.createOwner(ownerPayload);
+        await residenceStore.companyOwner({
+          companyId: props.residence.companyId,
+          ownerId: response.data,
+          state: 'Aprobado'
+        });
+
+        Notify.create({
+          type: 'positive',
+          message: 'Dueño asignado con éxito',
+          position: 'top-right',
+          timeout: 3000,
+        });
+      }
 
       emit('owner-created');
       createOwnerModalVisible.value = false;
@@ -350,10 +464,14 @@ export default defineComponent({
     return {
       activeTab,
       createOwnerModalVisible,
+      isEditOwner,
+      ownerSelected,
 
+      deleteOwner,
       handleOwnerSubmit,
       openCreateOwnerModal,
       formatDate,
+      editOwner
     };
   },
 });

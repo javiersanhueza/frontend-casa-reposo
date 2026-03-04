@@ -44,14 +44,14 @@ export default defineComponent({
     const employeeStore = useEmployeeStore(pinia());
     const employees = ref<Employee[]>([]);
 
-    const getEmployees = async (page: number, limit: number) => {
-      await employeeStore.getEmployees(page, limit);
+    const getEmployees = async () => {
+      await employeeStore.getEmployeesPagination();
       employees.value = employeeStore.employees || [];
     };
 
     onMounted(() => {
       if (!employeeStore?.employees?.length) {
-        getEmployees(1, 10);
+        getEmployees();
       } else {
         employees.value = employeeStore.employees || [];
       }

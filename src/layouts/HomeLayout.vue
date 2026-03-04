@@ -6,8 +6,8 @@
 
         <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
 
-        <div class="q-ml-sm text-h6 text-weight-bold flex items-center letter-spacing-1">
-          <q-icon name="health_and_safety" size="sm" class="q-mr-sm" v-if="$q.screen.gt.xs" />
+        <div class="q-ml-sm text-h6 text-weight-bold flex items-center letter-spacing-1" v-if="$q.screen.gt.xs">
+          <q-icon name="health_and_safety" size="sm" class="q-mr-sm" />
           Mi Plataforma
         </div>
 
