@@ -3,9 +3,9 @@ import moment from 'moment/moment';
 export const globalMixin = {
   methods: {
     getNameCompany(): string {
-      const userData = localStorage.getItem('user');
-      if (userData) {
-        return '' /*JSON.parse(userData).company.companyName*/;
+      const companySelected = localStorage.getItem('companySelected');
+      if (companySelected) {
+        return JSON.parse(companySelected).name;
       }
       return '';
     },

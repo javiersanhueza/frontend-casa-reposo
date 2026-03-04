@@ -1,97 +1,77 @@
 <template>
-  <q-btn round flat size="lg" icon="account_circle">
-    <q-menu v-model="menu" anchor="bottom right" self="top right">
-      <div class="row no-wrap q-pa-md" v-if="$q.screen.gt.xs">
-        <div class="column">
-          <q-item
-            v-for="option in menuConfigUser"
-            :key="option.id"
-            :to="{ name: option.to }"
-            class="text-grey-7"
-          >
-            <q-item-section avatar>
-              <q-icon :name="option.icon" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>{{ option.label }}</q-item-label>
-            </q-item-section>
-          </q-item>
-        </div>
+  <q-btn round flat class="q-ml-sm">
+    <q-avatar size="38px" color="primary" text-color="white" class="shadow-1">
+      {{ userInitials }}
+    </q-avatar>
 
-        <q-separator vertical inset class="q-mx-lg" />
+    <q-menu
+      v-model="menu"
+      anchor="bottom right"
+      self="top right"
+      transition-show="jump-down"
+      transition-hide="jump-up"
+      style="min-width: 260px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);"
+    >
+      <q-list class="q-py-sm">
 
-        <div class="column items-center">
-          <q-avatar
-            size="50px"
-            text-color="grey-7"
-            icon="account_circle"
-            font-size="50px"
-          />
+        <q-item class="q-pb-md">
+          <q-item-section avatar>
+            <q-avatar size="48px" color="primary" text-color="white">
+              {{ userInitials }}
+            </q-avatar>
+          </q-item-section>
+          <q-item-section>
+            <q-item-label class="text-weight-bold text-subtitle2 text-grey-9">
+              {{ user?.firstName }} {{ user?.firstSurname }}
+            </q-item-label>
+            <q-item-label caption class="text-grey-6 ellipsis">
+              {{ user?.email }}
+            </q-item-label>
+          </q-item-section>
+        </q-item>
 
-          <div class="col text-caption text-grey-7 text-right text-weight-bold">
-            {{ user?.firstName }} {{ user?.firstSurname }}
-          </div>
-          <div class="col text-caption text-grey-7 text-right">
-            {{ user?.email }}
-          </div>
+        <q-separator inset class="q-mb-sm" />
 
-          <q-btn
-            @click="logOut()"
-            label="Cerrar sesión"
-            text-color="white"
-            push
-            icon="logout"
-            size="sm"
-            class="q-mt-sm background-header full-width"
-          />
-        </div>
-      </div>
-      <div class="row no-wrap q-pa-md" v-else>
-        <div class="column items-center">
-          <q-avatar
-            size="50px"
-            text-color="grey-7"
-            icon="account_circle"
-            font-size="50px"
-          />
+        <q-item
+          v-for="option in menuConfigUser"
+          :key="option.id"
+          clickable
+          v-close-popup
+          :to="{ name: option.to }"
+          class="text-grey-8"
+        >
+          <q-item-section avatar style="min-width: 40px;">
+            <q-icon :name="option.icon" color="grey-6" size="sm" />
+          </q-item-section>
+          <q-item-section class="text-body2 text-weight-medium">
+            {{ option.label }}
+          </q-item-section>
+        </q-item>
 
-          <div class="col text-caption text-right text-grey-7 text-weight-bold">
-            {{ user?.firstName }} {{ user?.firstSurname }}
-          </div>
-          <div class="col text-caption text-right text-grey-7">
-            {{ user?.email }}
-          </div>
+        <q-separator inset class="q-my-sm" />
 
-          <q-btn
-            v-for="option in menuConfigUser"
-            :key="option.id"
-            :to="{ name: option.to }"
-            :label="option.label"
-            :icon="option.icon"
-            text-color="white"
-            size="sm"
-            class="q-mt-sm background-header full-width"
-            push
-          />
+        <q-item
+          clickable
+          v-close-popup
+          @click="logOut"
+          class="text-negative"
+        >
+          <q-item-section avatar style="min-width: 40px;">
+            <q-icon name="logout" color="negative" size="sm" />
+          </q-item-section>
+          <q-item-section class="text-body2 text-weight-medium">
+            Cerrar sesión
+          </q-item-section>
+        </q-item>
 
-          <q-btn
-            @click="logOut()"
-            label="Cerrar sesión"
-            text-color="white"
-            push
-            icon="logout"
-            size="sm"
-            class="q-mt-sm background-header full-width"
-          />
-        </div>
-      </div>
+      </q-list>
     </q-menu>
   </q-btn>
 </template>
-<script lang="ts">
-import { defineComponent, ref } from 'vue';
-import { useRouter } from 'vue-router';
 
+<script lang="ts">
+import { defineComponent, ref, computed } from 'vue';
+import { useRouter } from 'vue-router';
 import { Menu } from 'layouts/interfaces';
 
 export default defineComponent({
@@ -99,9 +79,19 @@ export default defineComponent({
 
   setup() {
     const router = useRouter();
-    const user = JSON.parse(localStorage.getItem('user')!);
+    // Uso opcional chaining (?) por seguridad al parsear el localstorage
+    const userStr = localStorage.getItem('user');
+    const user = userStr ? JSON.parse(userStr) : null;
 
     const menu = ref(false);
+
+    // Creamos las iniciales (Ej: "Juan Perez" -> "JP")
+    const userInitials = computed(() => {
+      if (!user) return 'U';
+      const first = user.firstName ? user.firstName.charAt(0).toUpperCase() : '';
+      const last = user.firstSurname ? user.firstSurname.charAt(0).toUpperCase() : '';
+      return `${first}${last}`;
+    });
 
     const logOut = () => {
       localStorage.clear();
@@ -113,25 +103,23 @@ export default defineComponent({
         id: 1,
         to: 'ChangeCompany',
         icon: 'apartment',
-        label: 'Cambiar de empresa',
+        label: 'Cambiar de residencia',
       },
       {
-        id: 1,
+        id: 2, // Corregido: ID único
         to: 'EditUser',
-        icon: 'edit',
+        icon: 'manage_accounts', // Cambié el ícono 'edit' por algo más de perfil
         label: 'Editar mis datos',
       },
     ]);
 
     return {
       user,
+      userInitials,
       menu,
       menuConfigUser,
-
       logOut
-    }
-
+    };
   }
-})
-
+});
 </script>

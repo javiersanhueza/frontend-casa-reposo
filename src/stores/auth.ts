@@ -32,18 +32,27 @@ export const useAuthStore = defineStore('auth', {
           { email, password }
         );
 
-        const user = {
-          firstName: response.data.data.firstName,
-          firstSurname: response.data.data.firstSurname,
-          photo: response.data.data.photo,
-          roles: response.data.data.roles
+        if (response.data.statusCode === 200) {
+          const user = {
+            firstName: response.data.data.firstName,
+            firstSurname: response.data.data.firstSurname,
+            photo: response.data.data.photo,
+            roles: response.data.data.roles
+          }
+
+          localStorage.setItem('token', response.data.data.token);
+          localStorage.setItem('user', JSON.stringify(user));
+
+          this.token = response.data.data.token;
+          this.user = user;
+        } else {
+          Notify.create({
+            type: 'negative',
+            message: 'Credenciales incorrectas. Por favor, intenta de nuevo.',
+            position: 'top-right',
+            icon: 'report_problem'
+          });
         }
-
-        localStorage.setItem('token', response.data.data.token);
-        localStorage.setItem('user', JSON.stringify(user));
-
-        this.token = response.data.data.token;
-        this.user = user;
       } catch (error) {
         console.log('Error en el login:', error);
       }

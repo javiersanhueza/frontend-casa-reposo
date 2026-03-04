@@ -1,44 +1,52 @@
 <template>
-  <q-layout view="hHh LpR fFf" class="bg-grey-3 q-pa-lg">
-    <q-header elevated class="background-header text-white">
-      <q-toolbar>
-        <q-btn cdense flat round icon="menu" @click="toggleLeftDrawer" />
+  <q-layout view="lHh Lpr lFf" class="bg-grey-2">
 
-        <!--
-        <q-img
-          src="src/assets/logo_vertical_white.png"
-          width="8%"
-          color="white"
-          v-if="$q.screen.gt.xs"
-          class="q-ml-md"
-        />
+    <q-header class="background-header text-white shadow-2">
+      <q-toolbar class="q-px-md" style="min-height: 64px;">
 
-        -->
+        <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
+
+        <div class="q-ml-sm text-h6 text-weight-bold flex items-center letter-spacing-1">
+          <q-icon name="health_and_safety" size="sm" class="q-mr-sm" v-if="$q.screen.gt.xs" />
+          Mi Plataforma
+        </div>
 
         <q-space></q-space>
 
-        <q-badge v-if="!isSuperUser" rounded color="amber-7" :label="getNameCompany()" />
+        <q-chip
+          v-if="!isSuperUser"
+          color="white"
+          text-color="primary"
+          icon="apartment"
+          class="text-weight-bold shadow-1 q-mr-md q-py-sm"
+        >
+          {{ getNameCompany() }}
+        </q-chip>
 
-        <div class="colum q-ml-sm">
+        <div class="column q-ml-sm">
           <menu-component />
         </div>
+
       </q-toolbar>
     </q-header>
 
     <q-drawer
-      :width="250"
-      show-if-above
       v-model="leftDrawerOpen"
-      side="left"
+      show-if-above
       bordered
+      :width="260"
       class="bg-white"
+      :elevation="1"
     >
       <drawer-component />
     </q-drawer>
 
     <q-page-container>
-      <router-view />
+      <div class="q-pa-md q-pa-md-lg">
+        <router-view />
+      </div>
     </q-page-container>
+
   </q-layout>
 </template>
 
