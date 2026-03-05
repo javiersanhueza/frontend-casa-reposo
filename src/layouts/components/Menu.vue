@@ -79,7 +79,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue';
+import { defineComponent, ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
 import { Menu } from 'layouts/interfaces';
 
@@ -88,16 +88,42 @@ export default defineComponent({
 
   setup() {
     const router = useRouter();
-    const userStr = localStorage.getItem('user');
-    const user = userStr ? JSON.parse(userStr) : null;
-
     const menu = ref(false);
 
+    const userStr = localStorage.getItem('user');
+    const user = ref(userStr ? JSON.parse(userStr) : null);
+
+    const syncUser = () => {
+      const freshUserStr = localStorage.getItem('user');
+      user.value = freshUserStr ? JSON.parse(freshUserStr) : null;
+    };
+
+    onMounted(() => {
+      window.addEventListener('user-profile-updated', syncUser);
+    });
+
+    onBeforeUnmount(() => {
+      window.removeEventListener('user-profile-updated', syncUser);
+    });
+
     const userInitials = computed(() => {
-      if (!user) return 'U';
-      const first = user.firstName ? user.firstName.charAt(0).toUpperCase() : '';
-      const last = user.firstSurname ? user.firstSurname.charAt(0).toUpperCase() : '';
+      if (!user.value) return 'U';
+      const first = user.value.firstName ? user.value.firstName.charAt(0).toUpperCase() : '';
+      const last = user.value.firstSurname ? user.value.firstSurname.charAt(0).toUpperCase() : '';
       return `${first}${last}`;
+    });
+
+    const userRoleInfo = computed(() => {
+      const roles = user.value?.roles;
+      if (!roles) return { label: 'Sin Rol', color: 'grey-7' };
+
+      if (roles.superUser) return { label: 'Súper Usuario', color: 'purple-7' };
+      if (roles.admin) return { label: 'Administrador', color: 'primary' };
+      if (roles.owner) return { label: roles.owner, color: 'orange-8' };
+      if (roles.employee) return { label: 'Empleado', color: 'teal-7' };
+      if (roles.proxy) return { label: 'Apoderado', color: 'accent' };
+
+      return { label: 'Usuario', color: 'grey-7' };
     });
 
     const logOut = () => {
@@ -105,34 +131,9 @@ export default defineComponent({
       router.push({ name: 'Login' });
     };
 
-    const userRoleInfo = computed(() => {
-      const roles = user?.roles;
-      if (!roles) return { label: 'Sin Rol', color: 'grey-7' };
-
-      if (roles.superUser) return { label: 'Súper Usuario', color: 'purple-7' };
-      if (roles.admin) return { label: 'Administrador', color: 'primary' };
-
-      if (roles.owner) return { label: roles.owner, color: 'orange-8' };
-
-      if (roles.employee) return { label: 'Empleado', color: 'teal-7' };
-      if (roles.proxy) return { label: 'Apoderado', color: 'accent' };
-
-      return { label: 'Usuario', color: 'grey-7' };
-    });
-
     const menuConfigUser = ref<Menu[]>([
-      {
-        id: 1,
-        to: 'ChangeCompany',
-        icon: 'apartment',
-        label: 'Cambiar de residencia',
-      },
-      {
-        id: 2,
-        to: 'EditUser',
-        icon: 'manage_accounts',
-        label: 'Editar mis datos',
-      },
+      { id: 1, to: 'ChangeCompany', icon: 'apartment', label: 'Cambiar de residencia' },
+      { id: 2, to: 'EditUser', icon: 'manage_accounts', label: 'Mi perfil' },
     ]);
 
     return {
@@ -141,7 +142,6 @@ export default defineComponent({
       menu,
       menuConfigUser,
       userRoleInfo,
-
       logOut
     };
   }

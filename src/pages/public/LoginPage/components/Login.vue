@@ -78,7 +78,7 @@
         dense
         class="text-body2 text-weight-medium q-mb-sm"
       />
-      <div class="text-grey-7 text-body2">
+      <div class="text-grey-7 text-body2" v-if="false">
         ¿No tienes una cuenta?
         <q-btn
           @click="router.push({ name: 'Register' })"

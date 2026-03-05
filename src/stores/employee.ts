@@ -20,7 +20,7 @@ export const useEmployeeStore = defineStore('employee', {
     limit: 10,
     offset: 0,
     order: 'ASC',
-    orderBy: 'rut',
+    orderBy: 'run',
     totalPage: null
   }),
 
@@ -33,7 +33,7 @@ export const useEmployeeStore = defineStore('employee', {
       try {
         this.employees = [];
         const response: AxiosResponse<{ data: { count: number, rows: any[] }, statusCode: number, send: string }> = await apiClient.post(
-          '/employees/pagination',
+          `/employees/pagination/companyId/${globalMixin.methods.getIdCompany()}`,
           {
             limit: this.limit,
             offset: this.offset,

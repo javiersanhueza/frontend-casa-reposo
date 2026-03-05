@@ -16,9 +16,9 @@ export const globalMixin = {
     },
 
     getIdCompany(): number {
-      const user = localStorage.getItem('user');
-      if (user) {
-        return JSON.parse(user).companyId;
+      const companySelected = localStorage.getItem('companySelected');
+      if (companySelected) {
+        return JSON.parse(companySelected).companyId;
       }
       return 0;
     },

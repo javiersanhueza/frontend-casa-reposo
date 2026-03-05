@@ -42,7 +42,7 @@
     </q-drawer>
 
     <q-page-container>
-      <div class="q-pa-md q-pa-md-lg">
+      <div class="">
         <router-view />
       </div>
     </q-page-container>

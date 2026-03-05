@@ -5,6 +5,7 @@ import { CreateUserPayload, User } from 'src/interfaces/users.interface';
 
 interface UserState {
   users: User[] | null;
+  profile: any;
   limit: number;
   offset: number;
   order: string;
@@ -15,6 +16,7 @@ interface UserState {
 export const useUserStore = defineStore('user', {
   state: (): UserState => ({
     users: [],
+    profile: {},
     limit: 10,
     offset: 0,
     order: 'ASC',
@@ -152,6 +154,34 @@ export const useUserStore = defineStore('user', {
         };
       } catch (error) {
         console.log('Error en getUsers', error);
+      }
+    },
+
+    async getProfile() {
+      try {
+        const response: AxiosResponse<{ data: any, statusCode: number, send: string }> = await apiClient.get(
+          'users/profile'
+        );
+
+        this.profile = response.data.data;
+      } catch (error) {
+        console.log('Error en getUsers', error);
+      }
+    },
+
+    async updateProfile(user: any) {
+      try {
+        const response: AxiosResponse = await apiClient.put<{ data: { data: number; send: string; statusCode: number }}>(
+          '/users/update/data/header',
+          user
+        );
+
+        if (response.data.statusCode === 201) {
+          return response.data;
+        }
+
+      } catch (error) {
+        console.log('Error en updateProfile', error);
       }
     },
   }

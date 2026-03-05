@@ -1,178 +1,149 @@
 <template>
-  <q-dialog v-model="internalDialog" :full-width="$q.screen.xs" :full-height="$q.screen.xs">
-    <q-card class="q-dialog-plugin" :class="{'dialog-fullscreen': $q.screen.xs}">
-      <q-card-section>
-        <div class="row items-center justify-between">
-          <div class="text-h6 text-grey-7">{{ title }}</div>
-          <q-btn flat round dense icon="close" @click="internalDialog = false" />
-        </div>
+  <q-dialog v-model="internalVisible" persistent>
+    <q-card style="width: 500px; max-width: 90vw; border-radius: 12px;">
+
+      <q-card-section class="bg-primary text-white row items-center q-pb-md">
+        <div class="text-h6 text-weight-bold">{{ title }}</div>
+        <q-space />
+        <q-btn icon="close" flat round dense v-close-popup />
       </q-card-section>
-      <q-card-section class="dialog-content">
-        <q-form ref="employeeForm">
-          <q-input
-            v-model="newEmployee.firstName"
-            label="Nombres"
-            lazy-rules
-            :rules="[
-              (val: string) => val && val.length > 0 || 'Campo requerido'
-            ]"
-          />
-          <div class="row">
-            <div class="col-md-6 q-pr-sm">
-              <q-input
-                v-model="newEmployee.paternalSurname"
-                label="Apellido Paterno"
-                lazy-rules
-                :rules="[
-                (val: string) => val && val.length > 0 || 'Campo requerido'
-                ]"
-              />
-            </div>
-            <div class="col-md-6">
-              <q-input
-                v-model="newEmployee.maternalSurname"
-                label="Apellido Materno"
-                lazy-rules
-                :rules="[
-                  (val: string) => val && val.length > 0 || 'Campo requerido'
-                ]"
-              />
-            </div>
+
+      <q-form @submit.prevent="onSubmit" class="q-pa-md">
+        <div class="row q-col-gutter-md">
+
+          <div class="col-12 col-sm-6">
+            <q-input
+              outlined
+              v-model="form.firstName"
+              label="Primer Nombre *"
+              lazy-rules
+              :rules="[val => !!val || 'Campo requerido']"
+            >
+              <template v-slot:prepend><q-icon name="person" color="grey-6" /></template>
+            </q-input>
           </div>
-        </q-form>
-      </q-card-section>
-      <q-card-actions align="right" class="q-pa-md row no-wrap items-center" :class="{'dialog-actions': $q.screen.xs}" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-        <q-btn outline label="Cancelar" color="white" text-color="purple-6" @click="internalDialog = false" />
-        <q-btn unelevated label="Aceptar" class="background-header" text-color="white" @click="submitForm" />
-      </q-card-actions>
+
+          <div class="col-12 col-sm-6">
+            <q-input
+              outlined
+              v-model="form.firstSurname"
+              label="Apellido Paterno *"
+              lazy-rules
+              :rules="[val => !!val || 'Campo requerido']"
+            >
+              <template v-slot:prepend><q-icon name="group" color="grey-6" /></template>
+            </q-input>
+          </div>
+
+          <div class="col-12">
+            <q-input
+              outlined
+              v-model="form.run"
+              label="RUN *"
+              maxlength="12"
+              @update:model-value="onRutInput"
+              :disable="isEditing"
+              hint="Ej: 12.345.678-9"
+              lazy-rules
+              :rules="[
+                val => !!val || 'Campo requerido',
+                val => isValidRut(val) || 'RUN inválido'
+              ]"
+            >
+              <template v-slot:prepend><q-icon name="fingerprint" color="grey-6" /></template>
+            </q-input>
+          </div>
+
+          <div class="col-12">
+            <q-select
+              outlined
+              v-model="form.role"
+              :options="['Enfermero', 'TENS', 'Médico', 'Cuidador', 'Administrativo']"
+              label="Rol del Trabajador *"
+              lazy-rules
+              :rules="[val => !!val || 'Campo requerido']"
+            >
+              <template v-slot:prepend><q-icon name="work" color="grey-6" /></template>
+            </q-select>
+          </div>
+
+        </div>
+
+        <q-separator class="q-mt-md q-mb-sm" />
+
+        <div class="row justify-end q-gutter-sm">
+          <q-btn flat label="Cancelar" color="grey-8" v-close-popup />
+          <q-btn unelevated label="Guardar Trabajador" color="primary" type="submit" />
+        </div>
+      </q-form>
+
     </q-card>
   </q-dialog>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch } from 'vue';
-import { Notify, QForm } from 'quasar';
-
-import pinia from 'src/stores';
-import { NewEmployee } from 'src/interfaces/employees.interface';
-import { useEmployeeStore } from 'stores/employee';
+import { defineComponent, ref, computed, watch } from 'vue';
+import { useRut } from 'src/composables/useRut';
 
 export default defineComponent({
-  name: 'NewEmployeeDialog',
-
+  name: 'EmployeeDialog',
   props: {
-    showDialog: {
-      type: Boolean,
-      required: true
-    },
-    title: {
-      type: String,
-      required: true
-    },
-    isEdit: {
-      type: Boolean,
-      default: false
-    },
-    employeeEdit: {
-      type: Object
-    }
+    modelValue: { type: Boolean, required: true },
+    title: { type: String, required: true },
+    employeeEdit: { type: Object, default: null }
   },
-
-  emits: ['update:showDialog', 'accept'],
+  emits: ['update:modelValue', 'submitted'],
 
   setup(props, { emit }) {
-    const internalDialog = ref(props.showDialog);
-    const newEmployee = ref<NewEmployee>({
+    const { formatRut, validateRut } = useRut();
+
+    const internalVisible = computed({
+      get: () => props.modelValue,
+      set: (val) => emit('update:modelValue', val)
+    });
+
+    const isEditing = computed(() => !!props.employeeEdit);
+
+    const form = ref({
       firstName: '',
-      paternalSurname: '',
-      maternalSurname: '',
-      rut: ''
-    });
-    const employeeForm = ref<QForm | null>(null);
-
-    const employeeStore = useEmployeeStore(pinia());
-
-    watch(() => props.showDialog, (newVal) => {
-      internalDialog.value = newVal;
-      newEmployee.value = {
-        firstName: props.employeeEdit?.firstName,
-        paternalSurname: props.employeeEdit?.paternalSurname,
-        maternalSurname: props.employeeEdit?.maternalSurname,
-        rut: props.employeeEdit?.rut
-      }
+      firstSurname: '',
+      run: '',
+      role: ''
     });
 
-    watch(internalDialog, (newVal) => {
-      emit('update:showDialog', newVal);
-    });
-
-    const closeDialog = () => {
-      internalDialog.value = false;
-    };
-
-    const submitForm = () => {
-      if (employeeForm.value) {
-        employeeForm.value.validate().then((valid: boolean) => {
-          if (valid) {
-            acceptAction();
-          }
-        });
-      }
-    };
-
-    const acceptAction = async () => {
-      if (!props.isEdit) {
-        const res = await employeeStore.createEmployee(newEmployee.value);
-
-        if (!!res?.employee) {
-          Notify.create({
-            type: 'positive',
-            message: 'Trabajador registrado con éxito',
-            position: 'top',
-            timeout: 3000
-          });
-
-          newEmployee.value = {
-            firstName: '',
-            paternalSurname: '',
-            maternalSurname: '',
-            rut: ''
+    watch(() => props.modelValue, (isOpen) => {
+      if (isOpen) {
+        if (props.employeeEdit) {
+          form.value = {
+            firstName: props.employeeEdit.firstName || '',
+            firstSurname: props.employeeEdit.firstSurname || '',
+            run: formatRut(props.employeeEdit.run) || '',
+            role: props.employeeEdit.role || ''
           };
-
-          emit('accept');
-          closeDialog();
-        }
-      } else {
-        console.log(newEmployee.value);
-        const res = await employeeStore.editEmployee(newEmployee.value, props.employeeEdit!.id);
-
-        if (!!res.employee) {
-          Notify.create({
-            type: 'positive',
-            message: 'Empresa editada con éxito',
-            position: 'top',
-            timeout: 3000
-          });
-
-          emit('accept');
-          closeDialog();
+        } else {
+          // Reset para Crear
+          form.value = { firstName: '', firstSurname: '', run: '', role: '' };
         }
       }
+    });
+
+    const onRutInput = (value: string | number | null) => {
+      if (!value) { form.value.run = ''; return; }
+      form.value.run = formatRut(String(value));
     };
 
     const onSubmit = () => {
-      submitForm();
+      // Enviamos el payload al padre (EmployeesPage.vue)
+      emit('submitted', { ...form.value });
     };
 
     return {
-      internalDialog,
-      newEmployee,
-      employeeForm,
-
-      onSubmit,
-      closeDialog,
-      submitForm,
-      acceptAction
+      internalVisible,
+      form,
+      isEditing,
+      onRutInput,
+      isValidRut: validateRut,
+      onSubmit
     };
   }
 });

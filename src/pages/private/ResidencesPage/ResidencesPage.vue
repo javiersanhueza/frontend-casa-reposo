@@ -1,30 +1,32 @@
 <template>
-  <div class="text-h6 text-grey-7 q-mb-sm">Residencias</div>
+  <q-page class="q-pa-md">
+    <div class="text-h6 text-grey-7 q-mb-sm">Residencias</div>
 
-  <q-card class="q-pa-md" flat style="border-radius: 10px">
-    <q-card-section>
-      <residences-component />
-    </q-card-section>
-  </q-card>
+    <q-card class="q-pa-md shadow-2" style="border-radius: 10px">
+      <q-card-section>
+        <residences-component />
+      </q-card-section>
+    </q-card>
 
-  <q-page-sticky position="bottom-right" :offset="[18, 18]">
-    <q-btn @click="dialogVisible = true" fab icon="add" color="primary">
-      <q-tooltip
-        v-if="!$q.screen.xs"
-        anchor="center left"
-        self="center middle"
-        :offset="[55, 55]"
-      >
-        Nuevo residencia
-      </q-tooltip>
-    </q-btn>
-  </q-page-sticky>
+    <q-page-sticky position="bottom-right" :offset="[18, 18]">
+      <q-btn @click="dialogVisible = true" fab icon="add" color="primary">
+        <q-tooltip
+          v-if="!$q.screen.xs"
+          anchor="center left"
+          self="center middle"
+          :offset="[55, 55]"
+        >
+          Nuevo residencia
+        </q-tooltip>
+      </q-btn>
+    </q-page-sticky>
 
-  <new-residence
-    title="Nueva residencia"
-    v-model:dialogVisible="dialogVisible"
-    @submitted="handleResidenceCreate"
-  />
+    <new-residence
+      title="Nueva residencia"
+      v-model:dialogVisible="dialogVisible"
+      @submitted="handleResidenceCreate"
+    />
+  </q-page>
 </template>
 
 <script lang="ts">
