@@ -10,8 +10,12 @@ export interface Employee {
 }
 
 export interface NewEmployee {
+  email: string;
   firstName: string;
-  paternalSurname: string;
-  maternalSurname: string;
-  rut: string;
+  firstSurname: string;
+  secondName: string;
+  secondSurname: string;
+  run: string;
+  employeeRole: string;
+  password: string;
 }

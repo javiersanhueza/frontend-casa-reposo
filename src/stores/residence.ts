@@ -129,6 +129,37 @@ export const useResidenceStore = defineStore('residence', {
       } catch (error) {
         console.log('Error en companyOwner', error);
       }
+    },
+
+    async companyEmployee(body: any) {
+      try {
+        const response: AxiosResponse = await apiClient.post<{ data: { data: number; send: string; statusCode: number } }>(
+          '/company-employees',
+          body
+        );
+
+        if (response.data.statusCode === 201) {
+          return response.data;
+        }
+        return response;
+      } catch (error) {
+        console.log('Error en companyEmployee', error);
+      }
+    },
+
+    async deleteCompanyEmployee(id: number) {
+      try {
+        const response: AxiosResponse = await apiClient.delete<{ data: { data: number; send: string; statusCode: number } }>(
+          `/company-employees/${id}`
+        );
+
+        if (response.data.statusCode === 410) {
+          return response.data;
+        }
+        return response;
+      } catch (error) {
+        console.log('Error en deleteCompanyEmployee', error);
+      }
     }
   }
 })

@@ -12,14 +12,20 @@
 // to match your app's branding.
 // Tip: Use the "Theme Builder" on Quasar's documentation website.
 
-$primary   : #4A90E2; // Azul suave, confiable y moderno
-$secondary : #7BC6A4; // Verde menta, relajante y amigable
-$accent    : #D883B7; // Rosa lavanda, cálido y humano
+// ==========================================
+// PALETA CROZIER (Evolucionada y Moderna)
+// ==========================================
 
-$dark      : #2E2E2E; // Gris oscuro neutro
-$dark-page : #1A1A1A; // Fondo oscuro profundo
+$primary   : #347AB6; // Azul más profundo y corporativo. Transmite mayor solidez y autoridad.
+$secondary : #5EBC9A; // Verde menta ligeramente más saturado (mejor contraste en botones).
+$accent    : #CE70A7; // Lavanda un tono más intenso para darle un toque premium.
 
-$positive  : #4CAF50; // Verde éxito más natural
-$negative  : #E53935; // Rojo alerta más suave
-$info      : #29B6F6; // Azul claro informativo
-$warning   : #FFB300; // Amarillo dorado, más cálido
+// Tonos neutros con un ligero tinte azulado (Estilo Tailwind/SaaS moderno)
+$dark      : #1E293B; // Gris pizarra oscuro (mucho más elegante que el gris neutro puro)
+$dark-page : #0F172A; // Fondo oscuro con profundidad
+
+// Colores Semánticos (Ajustados para que no desentonen con los corporativos)
+$positive  : #10B981; // Verde éxito más vibrante (estilo esmeralda)
+$negative  : #EF4444; // Rojo alerta limpio y claro
+$info      : #3B82F6; // Azul informativo que resalta
+$warning   : #F59E0B; // Amarillo ámbar, muy profesional

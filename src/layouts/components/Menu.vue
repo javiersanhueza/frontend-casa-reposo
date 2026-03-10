@@ -131,10 +131,27 @@ export default defineComponent({
       router.push({ name: 'Login' });
     };
 
-    const menuConfigUser = ref<Menu[]>([
-      { id: 1, to: 'ChangeCompany', icon: 'apartment', label: 'Cambiar de residencia' },
-      { id: 2, to: 'EditUser', icon: 'manage_accounts', label: 'Mi perfil' },
-    ]);
+    const menuConfigUser = computed<Menu[]>(() => {
+      const menu: Menu[] = [];
+
+      if (!user.value?.roles?.superUser) {
+        menu.push({
+          id: 1,
+          to: 'ChangeCompany',
+          icon: 'apartment',
+          label: 'Cambiar de residencia'
+        });
+      }
+
+      menu.push({
+        id: 2,
+        to: 'EditUser',
+        icon: 'manage_accounts',
+        label: 'Mi perfil'
+      });
+
+      return menu;
+    });
 
     return {
       user,

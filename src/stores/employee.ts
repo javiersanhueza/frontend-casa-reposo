@@ -53,16 +53,9 @@ export const useEmployeeStore = defineStore('employee', {
     async createEmployee(newEmployee: NewEmployee) {
       try {
 
-        const companyId = globalMixin.methods.getIdCompany();
-
-        const body = {
-          ...newEmployee,
-          companyId
-        };
-
-        const response: AxiosResponse = await apiClient.post(
-          `/${process.env.CONTEXT_API_PRIVATE}/employees`,
-          body
+        const response: AxiosResponse = await apiClient.post<{ data: { data: number; send: string; statusCode: number } }>(
+          '/employees/simple',
+          newEmployee
         );
 
         return response.data;
@@ -72,28 +65,58 @@ export const useEmployeeStore = defineStore('employee', {
       }
     },
 
+    async editEmployee(employee: NewEmployee, id: number) {
+      try {
+
+        const response: AxiosResponse = await apiClient.put<{ data: { data: number; send: string; statusCode: number } }>(
+          `/employees/update/data/${id}`,
+          {
+            ...employee,
+            gender: 'Masculino',
+            nationality: 'Chilena'
+          }
+        );
+
+        return response.data;
+
+      } catch (error) {
+        console.log('Error en createEmployee', error);
+      }
+    },
+
+    async getRunEmployee(run: string) {
+      try {
+        const response: AxiosResponse = await apiClient.get<{ data: { data: any; send: string; statusCode: number } }>(
+          `/employees/one/run/${run}`
+        );
+
+        return response.data.data;
+      } catch (error) {
+        console.log('Error en getEmployee', error);
+      }
+    },
+
+    async getEmployee(id: number) {
+      try {
+        const response: AxiosResponse = await apiClient.get<{ data: { data: any; send: string; statusCode: number } }>(
+          `/employees/one/userId/${id}`
+        );
+
+        return response.data.data;
+      } catch (error) {
+        console.log('Error en getEmployee', error);
+      }
+    },
+
     async deleteEmployee(employeeId: number | undefined) {
       try {
         const response: AxiosResponse = await apiClient.delete(
-          `/${process.env.CONTEXT_API_PRIVATE}/employees/${employeeId}`,
+          `/employees/${employeeId}`,
         );
 
         return response.data;
       } catch (error) {
         console.log('Error en deleteEmployee', error);
-      }
-    },
-
-    async editEmployee(employeeEdit: NewEmployee, employeeId: number) {
-      try {
-        const response: AxiosResponse = await apiClient.put(
-          `/${process.env.CONTEXT_API_PRIVATE}/employees/${employeeId}`,
-          { ...employeeEdit }
-        );
-
-        return response.data;
-      } catch (error) {
-        console.log('Error en editEmployee', error);
       }
     }
   }

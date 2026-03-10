@@ -65,7 +65,7 @@
 </template>
 
 <script lang="ts">
-import { ref, computed, defineComponent } from 'vue';
+import { ref, computed, defineComponent, watch } from 'vue'; // <-- 1. Importar watch
 import ItemComponent from 'layouts/components/Item.vue';
 import { Menu } from 'layouts/interfaces';
 import { useRoute } from 'vue-router';
@@ -77,6 +77,13 @@ export default defineComponent({
   setup() {
     const route = useRoute();
     const link = ref(route.name);
+
+    watch(
+      () => route.name,
+      (newRouteName) => {
+        link.value = newRouteName;
+      }
+    );
 
     const userStr = localStorage.getItem('user');
     const user = userStr ? JSON.parse(userStr) : null;
@@ -95,8 +102,13 @@ export default defineComponent({
     };
 
     const rawMenuResults: Menu[] = [
-      { id: 1, to: 'Home', icon: 'home', label: 'Home' },
-      { id: 2, to: 'ResidentPage', icon: 'elderly', label: 'Residentes', roles: ['admin'] },
+      { id: 1, to: 'Home', icon: 'home', label: 'Home' },{
+        id: 2,
+        to: 'ResidentPage',
+        icon: 'elderly',
+        label: 'Residentes',
+        roles: ['admin', 'owner:Administrador Residencia', 'owner:Dueño Residencia']
+      },
       {
         id: 8,
         to: 'Employee',
@@ -125,13 +137,7 @@ export default defineComponent({
         icon: 'manage_accounts',
         label: 'Usuarios',
         roles: ['superUser', 'admin']
-      },
-      /*{
-        id: 7,
-        to: 'OptionMaintainer',
-        icon: 'tune',
-        label: 'Mantenedor de opciones'
-      }*/
+      }
     ];
 
     const menuResults = computed(() => rawMenuResults.filter(item => hasRole(item.roles)));
@@ -147,7 +153,6 @@ export default defineComponent({
       menuConfigCompany,
       menuConfig,
       link,
-
       setActive
     };
   }

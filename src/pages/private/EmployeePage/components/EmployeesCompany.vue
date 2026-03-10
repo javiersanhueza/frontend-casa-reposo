@@ -36,87 +36,72 @@
 
   <q-card class="shadow-2" style="border-radius: 12px">
     <q-card-section>
+
       <q-table
+        v-if="filteredEmployees.length > 0"
         flat
         grid
         :rows="filteredEmployees"
         row-key="employeeId"
         :filter="filter"
-        no-data-label="No hay trabajadores registrados"
         hide-bottom
-        class="bg-transparent q-pa-md"
+        class="bg-transparent q-pa-none"
         :pagination="{ rowsPerPage: currentRowsPerPage }"
       >
         <template v-slot:item="props">
           <div class="q-pa-sm col-12 col-sm-6 col-md-4 col-lg-3">
             <q-card
               class="employee-card shadow-1 transition-ease bg-white h-100 column"
+              style="overflow: hidden; border-radius: 12px;"
             >
-              <q-card-section class="text-center q-pb-sm">
+              <q-card-section class="text-center q-pb-sm" style="min-width: 0; width: 100%;">
                 <q-avatar size="72px" class="shadow-2 q-mb-md">
-                  <img
-                    v-if="props.row.photo"
-                    :src="props.row.photo"
-                    alt="avatar"
-                  />
-                  <q-icon
-                    v-else
-                    name="person"
-                    color="white"
-                    class="bg-primary"
-                  />
+                  <img v-if="props.row.photo" :src="props.row.photo" alt="avatar" />
+                  <q-icon v-else name="person" color="white" class="bg-primary" />
                 </q-avatar>
 
-                <div class="text-h6 text-weight-bold text-grey-9 ellipsis">
+                <div class="text-h6 text-weight-bold text-dark ellipsis q-mb-sm" style="max-width: 100%;">
                   {{ props.row.firstName }} {{ props.row.firstSurname }}
+                  <q-tooltip class="bg-dark text-white text-body2 shadow-4" :delay="400" anchor="top middle" self="bottom middle" :offset="[10, 10]">
+                    {{ props.row.firstName }} {{ props.row.firstSurname }}
+                  </q-tooltip>
                 </div>
 
                 <div class="text-caption text-grey-6 q-mb-sm">
                   RUN: {{ props.row.run }}
                 </div>
 
-                <q-badge
-                  color="teal-1"
-                  text-color="teal-9"
-                  class="text-weight-bold q-px-sm q-py-xs"
-                  style="border-radius: 6px"
-                >
-                  {{ props.row.role || 'Sin rol asignado' }}
+                <q-badge color="teal-1" text-color="teal-9" class="text-weight-bold q-px-sm q-py-xs" style="border-radius: 6px">
+                  {{ props.row.role || props.row.employeeRole || 'Sin rol asignado' }}
                 </q-badge>
               </q-card-section>
 
-              <q-space /> <q-separator inset class="q-my-sm" />
+              <q-space />
+              <q-separator inset class="q-my-sm" />
 
-              <q-card-actions align="around" class="q-pt-none q-pb-sm">
-                <q-btn
-                  flat
-                  dense
-                  color="primary"
-                  icon="edit"
-                  label="Editar"
-                  class="text-weight-medium"
-                  @click="openDialogEdit(props.row)"
-                />
-                <q-btn
-                  flat
-                  dense
-                  color="negative"
-                  icon="delete_outline"
-                  label="Eliminar"
-                  class="text-weight-medium"
-                  @click="confirmDelete(props.row)"
-                />
+              <q-card-actions align="around" class="q-pt-none q-pb-sm no-wrap">
+                <q-btn flat dense color="primary" icon="edit" label="Editar" class="text-weight-medium" @click="openDialogEdit(props.row)" />
+                <q-btn flat dense color="negative" icon="delete_outline" label="Eliminar" class="text-weight-medium" @click="confirmDelete(props.row)" />
               </q-card-actions>
             </q-card>
           </div>
         </template>
       </q-table>
+
+      <div v-else class="full-width column flex-center q-pa-xl">
+        <q-icon name="group_off" size="72px" color="grey-4" class="q-mb-md" />
+        <div class="text-h6 text-weight-bold text-grey-7">No hay trabajadores registrados</div>
+        <div class="text-body2 text-grey-6 q-mt-sm text-center" style="max-width: 350px;">
+          Parece que aún no tienes a nadie en tu equipo o la búsqueda no arrojó resultados. Haz clic en "Nuevo Trabajador" para empezar.
+        </div>
+      </div>
+
     </q-card-section>
 
     <q-card-section
       class="bg-white"
       style="border-radius: 0 0 12px 12px; border-top: 1px solid #eee"
-      v-if="filteredEmployees.length > 0"
+      v-if="filteredEmployees && filteredEmployees.length > 0"
     >
       <pagination-controls
         :model-value="currentPage"
@@ -146,6 +131,7 @@ import { Employee } from 'src/interfaces/employees.interface';
 import { useEmployeeStore } from 'stores/employee';
 import PaginationControls from 'pages/private/components/PaginationControls.vue';
 import EmployeeDialog from 'pages/private/EmployeePage/components/NewEmployeeDialog.vue';
+import { useResidenceStore } from 'stores/residence';
 
 export default defineComponent({
   name: 'EmployeesCompany',
@@ -161,6 +147,7 @@ export default defineComponent({
     const showDialogDelete = ref(false);
 
     const employeeStore = useEmployeeStore(pinia());
+    const residenceStore = useResidenceStore(pinia());
     const filter = ref('');
 
     const selectedEmployee = ref<Employee>();
@@ -183,15 +170,13 @@ export default defineComponent({
         ok: { color: 'negative', label: 'Sí, Eliminar', unelevated: true },
         cancel: { color: 'grey-8', flat: true, label: 'Cancelar' },
       }).onOk(async () => {
-        $q.loading.show();
         try {
-          // await employeeStore.deleteEmployee(row.employeeId);
-          $q.notify({ type: 'positive', message: 'Trabajador eliminado' });
+          await residenceStore.deleteCompanyEmployee(row.companyEmployeeId);
+          await employeeStore.deleteEmployee(row.employeeId);
+          $q.notify({ type: 'positive', message: 'Trabajador eliminado', position: 'top-right', });
           await refreshData();
         } catch (error) {
-          $q.notify({ type: 'negative', message: 'Error al eliminar' });
-        } finally {
-          $q.loading.hide();
+          $q.notify({ type: 'negative', message: 'Error al eliminar', position: 'top-right', });
         }
       });
     };
@@ -209,8 +194,9 @@ export default defineComponent({
     const dialogVisible = ref(false);
     const dialogTitle = ref('Nuevo Trabajador');
 
-    const openDialogEdit = (row: any) => {
-      employeeToEdit.value = { ...row }; // Copia profunda simple
+    const openDialogEdit = async (row: any) => {
+      const response = await employeeStore.getEmployee(row.userId);
+      employeeToEdit.value = { ...response };
       dialogTitle.value = 'Editar Trabajador';
       dialogVisible.value = true;
     };
@@ -256,25 +242,40 @@ export default defineComponent({
       dialogVisible.value = true;
     };
 
+    const companyId = JSON.parse(localStorage.getItem('companySelected')!).companyId;
     const handleEmployeeSubmit = async (payload: any) => {
-      console.log(payload);
-      dialogVisible.value = false;
-      $q.loading.show({ message: 'Guardando...' });
-
       try {
         if (employeeToEdit.value) {
-          $q.notify({ type: 'positive', message: 'Trabajador actualizado' });
+          await employeeStore.editEmployee(payload, employeeToEdit.value.userId);
+          Notify.create({
+            type: 'positive',
+            message: 'Trabajador editado con éxito',
+            position: 'top-right',
+            timeout: 3000,
+          });
         } else {
-          $q.notify({ type: 'positive', message: 'Trabajador creado' });
+          const response = await employeeStore.createEmployee(payload);
+
+          await residenceStore.companyEmployee({
+            companyId: companyId,
+            employeeId: response.data,
+            state: 'Aprobado'
+          });
+          Notify.create({
+            type: 'positive',
+            message: 'Trabajador creado con éxito',
+            position: 'top-right',
+            timeout: 3000,
+          });
         }
+
+        dialogVisible.value = false;
         await refreshData();
       } catch (error) {
         $q.notify({
           type: 'negative',
           message: 'Error al procesar la solicitud',
         });
-      } finally {
-        $q.loading.hide();
       }
     };
 
@@ -292,6 +293,7 @@ export default defineComponent({
       dialogVisible,
       employeeToEdit,
 
+      changePage,
       handleEmployeeSubmit,
       openDialogEdit,
       confirmDelete,
